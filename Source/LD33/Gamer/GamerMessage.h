@@ -1,14 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+#include "GamerMessage.generated.h"
 
-/**
- * 
- */
+enum class GamerMessageType
+{
+	GMT_ReportBossUp,
+	GMT_RequestMemberJoin
+};
+
 class LD33_API FGamerMessage
 {
+	GENERATED_BODY()
 public:
-	virtual FString ToString(){ return ""; }
+	FString ToString();
 
 	class ABaseGamer* Sender;
 
