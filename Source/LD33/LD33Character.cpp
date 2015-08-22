@@ -2,6 +2,7 @@
 
 #include "LD33.h"
 #include "LD33Character.h"
+#include "Gamer/BaseGamer.h"
 
 ALD33Character::ALD33Character()
 {
@@ -32,19 +33,61 @@ ALD33Character::ALD33Character()
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	MaxHealth = 400000;
+}
+
+void ALD33Character::BeginPlay()
+{
+	Super::BeginPlay();
+
+	Health = MaxHealth;
+}
+
+void ALD33Character::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	AbilityCooldown -= DeltaSeconds;
 }
 
 void ALD33Character::FrontalConeAttack(FVector targetPt)
 {
+	if (AbilityCooldown > 0) return;
+
 	UE_LOG(LogTemp, Display, TEXT("Frontal cone attack at %s"), *targetPt.ToString());
+
+	AbilityCooldown = 1;
 }
 
 void ALD33Character::SoulDrainAttack(AActor* target)
 {
-	UE_LOG(LogTemp, Display, TEXT("SoulDrainAttack at %s"), *target->GetName());
+	if (AbilityCooldown > 0) return;
+
+	if (target)
+	{
+		UE_LOG(LogTemp, Display, TEXT("SoulDrainAttack at %s"), *target->GetName());
+
+		float initialHp = 100000;
+
+		if (auto a = Cast<ABaseGamer>(target)) initialHp = a->Health;
+
+		float actualDamage = target->TakeDamage(3500, FDamageEvent(), GetController(), this);
+
+		if (actualDamage >= initialHp)
+		{
+			Health += 40000;
+			UE_LOG(LogTemp, Display, TEXT("Successful soul drain"));
+		}
+
+		AbilityCooldown = 1;
+	}
 }
 
 void ALD33Character::MeteorAttack(FVector targetPt)
 {
+	if (AbilityCooldown > 0) return;
+
 	UE_LOG(LogTemp, Display, TEXT("MeteorAttack at %s"), *targetPt.ToString());
+
+	AbilityCooldown = 1;
 }

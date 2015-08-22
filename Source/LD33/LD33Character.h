@@ -25,8 +25,20 @@ public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
+	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
+
 	void FrontalConeAttack(FVector targetPt);
 	void SoulDrainAttack(AActor* target);
 	void MeteorAttack(FVector targetPt);
+
+	UPROPERTY(BlueprintReadOnly, Category = Stats)
+	float Health;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
+	float MaxHealth;
+
+	float AbilityCooldown;
 };
 
