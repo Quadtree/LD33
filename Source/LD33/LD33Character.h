@@ -40,5 +40,8 @@ public:
 	float MaxHealth;
 
 	float AbilityCooldown;
+
+	UPROPERTY(EditAnywhere, Category = Spawn)
+	TSubclassOf<class AMeteorProjectile> MeteorProjectileType;
 };
 

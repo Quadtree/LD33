@@ -2,6 +2,7 @@
 
 #include "LD33.h"
 #include "LD33Character.h"
+#include "MeteorProjectile.h"
 #include "Gamer/BaseGamer.h"
 
 ALD33Character::ALD33Character()
@@ -88,6 +89,21 @@ void ALD33Character::MeteorAttack(FVector targetPt)
 	if (AbilityCooldown > 0) return;
 
 	UE_LOG(LogTemp, Display, TEXT("MeteorAttack at %s"), *targetPt.ToString());
+
+	AMeteorProjectile* prj = GetWorld()->SpawnActor<AMeteorProjectile>(MeteorProjectileType, targetPt + FVector(0, 0, 5000), FRotator::ZeroRotator);
+	
+	if (prj)
+	{
+		UPrimitiveComponent* p = Cast<UPrimitiveComponent>(prj->GetRootComponent());
+		if (p)
+		{
+			p->SetPhysicsLinearVelocity(FVector(0, 0, -1800));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to spawn meteor"));
+	}
 
 	AbilityCooldown = 1;
 }
