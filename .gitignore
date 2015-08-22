@@ -1,0 +1,11 @@
+Binaries/*
+DerivedDataCache/*
+Intermediate/*
+Saved/*
+*.suo
+*.sdf
+*.opensdf
+*.fbx
+*.log
+*.sln
+Build/*
