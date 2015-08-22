@@ -26,12 +26,33 @@ void ABaseGamer::BeginPlay()
 
 	TArray<FString> syl;
 
-	FFileHelper::LoadANSITextFileToStrings(*(FPaths::GameContentDir() + "Data/Syllables.txt"), nullptr, syl);
-
-	while (true)
+	FFileHelper::LoadANSITextFileToStrings(*(FPaths::GameContentDir() + "Data/NameSyllables.txt"), nullptr, syl);
+	
+	if (syl.Num())
 	{
+		while (true)
+		{
+			FString newName = "";
 
+			while (FMath::RandRange(1, 4) != 1)
+			{
+				newName += syl[FMath::Rand() % syl.Num()];
+			}
+
+			if (newName.Len() > 9 || newName.Len() < 4) continue;
+
+			bool isMaleName = !newName.EndsWith("A") && newName.EndsWith("E");
+
+			if (isMaleName != IsMale) continue;
+
+			GamerName = newName.Left(1) + newName.Right(newName.Len() - 1).ToLower();
+			break;
+		}
+
+		UE_LOG(LogLD33, Display, TEXT("Name: %s"), *GamerName);
 	}
+
+	BlueprintInit();
 }
 
 // Called every frame

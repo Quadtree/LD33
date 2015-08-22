@@ -72,5 +72,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = Info)
 	bool IsLeader;
 
+	UPROPERTY(BlueprintReadOnly, Category = Info)
+	FString GamerName;
 
+	UFUNCTION(BlueprintImplementableEvent, Category = Init)
+	void BlueprintInit();
 };
