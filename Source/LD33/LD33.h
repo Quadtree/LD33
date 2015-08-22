@@ -4,6 +4,7 @@
 #define __LD33_H__
 
 #include "EngineMinimal.h"
+#include "DrawDebugHelpers.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogLD33, Log, All);
 

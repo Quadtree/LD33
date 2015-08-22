@@ -77,10 +77,11 @@ void ALD33Character::FrontalConeAttack(FVector targetPt)
 				FVector facing = GetActorRotation().RotateVector(FVector::RightVector);
 
 				float ang = FVector::DotProduct(delta, facing);
+				float ang2 = FVector::DotProduct(delta, GetActorRotation().RotateVector(FVector::ForwardVector));
 
-				UE_LOG(LogTemp, Display, TEXT("%s -> %s"), *a.Actor->GetName(), *FString::SanitizeFloat(ang));
+				UE_LOG(LogTemp, Display, TEXT("%s -> %s %s"), *a.Actor->GetName(), *FString::SanitizeFloat(ang), *FString::SanitizeFloat(ang2));
 
-				if (FMath::Abs(ang) < 0.3f)
+				if (FMath::Abs(ang) < 0.3f && ang2 > 0)
 				{
 					a.Actor->TakeDamage(2000, FDamageEvent(), GetController(), this);
 				}
