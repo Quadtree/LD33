@@ -57,6 +57,37 @@ void ALD33Character::FrontalConeAttack(FVector targetPt)
 
 	UE_LOG(LogTemp, Display, TEXT("Frontal cone attack at %s"), *targetPt.ToString());
 
+	FVector deltaToPt = targetPt - GetActorLocation();
+	deltaToPt.Z = 0;
+	deltaToPt.Normalize();
+
+	SetActorRotation(deltaToPt.Rotation());
+
+	TArray<FOverlapResult> res;
+
+	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(1500)))
+	{
+		for (auto a : res)
+		{
+			if (a.Actor.IsValid() && Cast<ABaseGamer>(a.Actor.Get()))
+			{
+				FVector delta = a.Actor->GetActorLocation() - GetActorLocation();
+				delta.Normalize();
+
+				FVector facing = GetActorRotation().RotateVector(FVector::RightVector);
+
+				float ang = FVector::DotProduct(delta, facing);
+
+				UE_LOG(LogTemp, Display, TEXT("%s -> %s"), *a.Actor->GetName(), *FString::SanitizeFloat(ang));
+
+				if (FMath::Abs(ang) < 0.3f)
+				{
+					a.Actor->TakeDamage(2000, FDamageEvent(), GetController(), this);
+				}
+			}
+		}
+	}
+
 	AbilityCooldown = 1;
 }
 
