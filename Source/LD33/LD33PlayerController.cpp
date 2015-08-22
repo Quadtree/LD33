@@ -117,7 +117,7 @@ void ALD33PlayerController::SoulDrainAttack()
 	{
 		TArray<FOverlapResult> res;
 
-		if (GetWorld()->OverlapMultiByChannel(res, Hit.ImpactPoint, FQuat::Identity, ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(500)))
+		if (GetWorld()->OverlapMultiByChannel(res, Hit.ImpactPoint, FQuat::Identity, ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(3000)))
 		{
 			float closestDistSquared = 10000000;
 			ABaseGamer* closest = nullptr;
