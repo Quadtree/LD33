@@ -6,6 +6,7 @@
 #include "GamerMessage.h"
 #include "EngineUtils.h"
 #include "LD33HUD.h"
+#include "Guild.h"
 
 
 // Sets default values
@@ -74,11 +75,13 @@ void ABaseGamer::UpdateState()
 {
 	TArray<FOverlapResult> res;
 
+	int32 numGuildMembersNearby = 0;
+
 	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_WorldDynamic, FCollisionShape::MakeSphere(4000)))
 	{
 		for (auto a : res)
 		{
-			if (CurrentState == GamerState::GS_Farming || CurrentState == GamerState::GS_Scouting || CurrentState == GamerState::GS_IdleInTown || CurrentState == GamerState::GS_AttackingBoss)
+			if (CurrentState == GamerState::GS_Farming || CurrentState == GamerState::GS_Scouting || CurrentState == GamerState::GS_IdleInTown || CurrentState == GamerState::GS_AttackingBoss || CurrentState == GamerState::GS_ApproachingBoss)
 			{
 				if (ALD33Character* t = Cast<ALD33Character>(a.Actor.Get()))
 				{
@@ -86,21 +89,31 @@ void ABaseGamer::UpdateState()
 					{
 						CurrentState = GamerState::GS_ReportingBossSighting;
 						SendGamerMessage(GamerMessageType::GMT_ReportBossUp);
-						break;
 					}
 
-					if (CurrentState != GamerState::GS_AttackingBoss && CurrentState == GamerState::GS_ApproachingBoss && IsLeader)
+					else if (CurrentState != GamerState::GS_AttackingBoss && CurrentState == GamerState::GS_ApproachingBoss && IsLeader)
 					{
 						SendGamerMessage(GamerMessageType::GMT_AttackBossNow);
-						break;
 					}
 
 					// saw the boss while in town. just attack!
-					if (CurrentState != GamerState::GS_AttackingBoss && CurrentState == GamerState::GS_IdleInTown)
+					else if (CurrentState != GamerState::GS_AttackingBoss && CurrentState == GamerState::GS_IdleInTown)
 					{
 						SendGamerMessage(GamerMessageType::GMT_AttackBossNow);
 						CurrentState = GamerState::GS_AttackingBoss;
-						break;
+					}
+				}
+			}
+
+			if (ABaseGamer* t = Cast<ABaseGamer>(a.Actor.Get()))
+			{
+				if (t->Guild == Guild)
+				{
+					++numGuildMembersNearby;
+
+					if (CurrentState == GamerState::GS_LookingForMore && t->CurrentState != GamerState::GS_FollowingLeader)
+					{
+						SendGamerMessage(GamerMessageType::GMT_RequestMemberJoin);
 					}
 				}
 			}
@@ -127,21 +140,71 @@ void ABaseGamer::UpdateState()
 
 		if (leader)
 		{
-			if (FVector::DistSquared(leader->GetActorLocation(), GetActorLocation()) > 750)
+			if (FVector::DistSquared(leader->GetActorLocation(), GetActorLocation()) > FMath::Square(750))
 			{
 				GetWorld()->GetNavigationSystem()->SimpleMoveToActor(GetController(), leader);
 			}
 			else
 			{
-				if (leader->CurrentState != GamerState::GS_LookingForMore || leader->CurrentState != GamerState::GS_ApproachingBoss || leader->CurrentState != GamerState::GS_AttackingBoss)
-				SendGamerMessage(GamerMessageType::GMT_ReportBossUp);
+				if (leader->CurrentState != GamerState::GS_LookingForMore && leader->CurrentState != GamerState::GS_ApproachingBoss && leader->CurrentState != GamerState::GS_AttackingBoss)
+				{
+					SendGamerMessage(GamerMessageType::GMT_ReportBossUp);
+				}
+				else
+				{
+					CurrentState = GamerState::GS_FollowingLeader;
+				}
 			}
+		}
+	}
+
+	if (CurrentState == GamerState::GS_LookingForMore)
+	{
+		UE_LOG(LogLD33, Display, TEXT("%s LFM"), *GetName());
+
+		float nearestDist = FLT_MAX;
+		ABaseGamer* nearest = nullptr;
+
+		for (TActorIterator<ABaseGamer> i(GetWorld()); i; ++i)
+		{
+			if (i->Guild == Guild && i->Health > 0)
+			{
+				float dist = FVector::DistSquared(i->GetActorLocation(), GetActorLocation());
+
+				if (dist > FMath::Square(2500) && dist < nearestDist)
+				{
+					nearestDist = dist;
+					nearest = *i;
+				}
+			}
+		}
+
+		if (!nearest)
+		{
+			UE_LOG(LogLD33, Display, TEXT("%s Starting to approach the boss"), *GetName());
+			CurrentState = GamerState::GS_ApproachingBoss;
+		}
+		else
+		{
+			GetWorld()->GetNavigationSystem()->SimpleMoveToActor(GetController(), nearest);
+		}
+	}
+
+	if (CurrentState == GamerState::GS_ApproachingBoss)
+	{
+		
+		for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
+		{
+			UE_LOG(LogLD33, Display, TEXT("%s approaching %s"), *GetName(), *i->GetName());
+			GetWorld()->GetNavigationSystem()->SimpleMoveToActor(GetController(), *i);
 		}
 	}
 }
 
 void ABaseGamer::SendGamerMessage(GamerMessageType type)
 {
+	UE_LOG(LogLD33, Display, TEXT("%s (%s) send %s"), *GetName(), *FString::FromInt(IsLeader), *FString::FromInt((int32)type));
+
 	FGamerMessage msg;
 	msg.Type = type;
 	msg.Sender = this;
@@ -169,13 +232,17 @@ void ABaseGamer::SendGamerMessage(GamerMessageType type)
 
 void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 {
-	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && msg.Type == GamerMessageType::GMT_RequestMemberJoin && msg.Sender->Guild == this->Guild && msg.Sender->IsLeader)
+	UE_LOG(LogLD33, Display, TEXT("%s (%s) rec %s"), *GetName(), *FString::FromInt(IsLeader), *FString::FromInt((int32)msg.Type));
+
+	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && msg.Type == GamerMessageType::GMT_RequestMemberJoin && msg.Sender->Guild == this->Guild && msg.Sender->IsLeader && !IsLeader)
 	{
+		UE_LOG(LogLD33, Display, TEXT("%s is now following leader"), *GetName());
 		CurrentState = GamerState::GS_FollowingLeader;
 	}
 
-	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && msg.Type == GamerMessageType::GMT_ReportBossUp && msg.Sender->Guild == this->Guild && IsLeader)
+	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_ApproachingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && msg.Type == GamerMessageType::GMT_ReportBossUp && msg.Sender->Guild == this->Guild && IsLeader)
 	{
+		UE_LOG(LogLD33, Display, TEXT("%s is now looking for more"), *GetName());
 		CurrentState = GamerState::GS_LookingForMore;
 	}
 }

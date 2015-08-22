@@ -41,6 +41,8 @@ void AGuild::BeginPlay()
 	
 	int32 memberCount = FMath::RandRange(3, 10);
 
+	NumMembers = memberCount;
+
 	bool startsAssembled = FMath::RandRange(1, memberCount) == 1;
 
 	TArray<FVector> spawnPoints;
@@ -139,7 +141,7 @@ FVector AGuild::GetPointOutsideOfTown()
 
 	for (int32 i = 0; i < 10000; ++i)
 	{
-		if (GetTerrainHeightAt(FVector2D(FMath::RandRange(-23000, 23000), FMath::RandRange(-23000, 23000)), pt))
+		if (GetTerrainHeightAt(FVector2D(FMath::RandRange(-WORLD_SIZE, WORLD_SIZE), FMath::RandRange(-WORLD_SIZE, WORLD_SIZE)), pt))
 		{
 			break;
 		}

@@ -28,6 +28,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = Name)
 	FString GuildName;
 
+	int32 NumMembers;
+
 	UPROPERTY(EditAnywhere, Category = Spawn)
 	TArray<TSubclassOf<class ABaseGamer>> GamerTypes;
 };

@@ -22,7 +22,7 @@ void ALD33HUD::DrawHUD()
 
 	FVector2D minimapSize = FVector2D(300, 300);
 	FVector2D minimapPos = FVector2D(30, Canvas->ClipY - 30 - minimapSize.Y);
-	FVector2D worldHalfSize = FVector2D(25000, 25000);
+	FVector2D worldHalfSize = FVector2D(WORLD_SIZE, WORLD_SIZE);
 
 	FCanvasTileItem bx(minimapPos, minimapSize, FColor::Black);
 
