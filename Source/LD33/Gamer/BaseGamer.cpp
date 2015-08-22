@@ -7,6 +7,7 @@
 #include "EngineUtils.h"
 #include "LD33HUD.h"
 #include "Guild.h"
+#include "AIController.h"
 
 
 // Sets default values
@@ -194,9 +195,12 @@ void ABaseGamer::UpdateState()
 	{
 		
 		for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
-		{
-			UE_LOG(LogLD33, Display, TEXT("%s approaching %s"), *GetName(), *i->GetName());
-			GetWorld()->GetNavigationSystem()->SimpleMoveToActor(GetController(), *i);
+		{ 
+			if (auto c = Cast<AAIController>(GetController()))
+			{
+				auto t = c->MoveToActor(*i, 1000);
+				UE_LOG(LogLD33, Display, TEXT("%s approaching %s (%s)"), *GetName(), *i->GetName(), *FString::FromInt((int32)t));
+			}
 		}
 	}
 }
@@ -238,13 +242,29 @@ void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 	{
 		UE_LOG(LogLD33, Display, TEXT("%s is now following leader"), *GetName());
 		CurrentState = GamerState::GS_FollowingLeader;
+
+		if (FMath::RandRange(1, 3) == 1) SendGamerMessage(GamerMessageType::GMT_Ack);
 	}
 
 	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_ApproachingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && msg.Type == GamerMessageType::GMT_ReportBossUp && msg.Sender->Guild == this->Guild && IsLeader)
 	{
 		UE_LOG(LogLD33, Display, TEXT("%s is now looking for more"), *GetName());
 		CurrentState = GamerState::GS_LookingForMore;
+
+		if (FMath::RandRange(1, 2) == 1) SendGamerMessage(GamerMessageType::GMT_Ack);
 	}
+
+	if (msg.Type == GamerMessageType::GMT_AttackBossNow && CurrentState != GamerState::GS_PlayerVersusPlayer && CurrentState != GamerState::GS_AttackingBoss && msg.Sender->Guild == Guild && msg.Sender->IsLeader)
+	{
+		CurrentState = GamerState::GS_AttackingBoss;
+
+		if (FMath::RandRange(1, 3) == 1) SendGamerMessage(GamerMessageType::GMT_Ack);
+	}
+}
+
+void ABaseGamer::Attack(AActor* target)
+{
+
 }
 
 // Called every frame

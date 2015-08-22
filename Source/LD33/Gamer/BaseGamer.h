@@ -100,4 +100,6 @@ public:
 
 	void SendGamerMessage(GamerMessageType type);
 	void ReceiveGamerMessage(const FGamerMessage& msg);
+
+	void Attack(AActor* target);
 };
