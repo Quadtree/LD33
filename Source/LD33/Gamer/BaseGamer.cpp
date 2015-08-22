@@ -24,6 +24,14 @@ void ABaseGamer::BeginPlay()
 	MagicAttack = BaseMagicAttack;
 	HealPower = BaseHealPower;
 
+	TArray<FString> syl;
+
+	FFileHelper::LoadANSITextFileToStrings(*(FPaths::GameContentDir() + "Data/Syllables.txt"), nullptr, syl);
+
+	while (true)
+	{
+
+	}
 }
 
 // Called every frame

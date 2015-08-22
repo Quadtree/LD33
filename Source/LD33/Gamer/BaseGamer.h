@@ -59,4 +59,18 @@ public:
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	void Respawn();
+
+	UPROPERTY(BlueprintReadOnly, Category = Info)
+	class AGuild* Guild;
+
+	UPROPERTY(BlueprintReadOnly, Category = Info)
+	FString Name;
+
+	UPROPERTY(BlueprintReadOnly, Category = Info)
+	bool IsMale;
+
+	UPROPERTY(BlueprintReadOnly, Category = Info)
+	bool IsLeader;
+
+
 };
