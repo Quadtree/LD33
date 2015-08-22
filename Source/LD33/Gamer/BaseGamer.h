@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "GamerMessage.h"
 #include "BaseGamer.generated.h"
 
 enum class GamerState : uint8
@@ -96,6 +97,6 @@ public:
 
 	GamerState CurrentState;
 
-	void SendGamerMessage(TSharedPtr<class FGamerMessage> msg);
-	void ReceiveGamerMessage(TSharedPtr<class FGamerMessage> msg);
+	void SendGamerMessage(GamerMessageType type);
+	void ReceiveGamerMessage(const FGamerMessage& msg);
 };

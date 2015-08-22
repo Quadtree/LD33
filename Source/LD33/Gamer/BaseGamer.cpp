@@ -101,9 +101,11 @@ void ABaseGamer::UpdateState()
 	}
 }
 
-void ABaseGamer::SendGamerMessage(TSharedPtr<FGamerMessage> msg)
+void ABaseGamer::SendGamerMessage(GamerMessageType type)
 {
-	msg->Sender = this;
+	FGamerMessage msg;
+	msg.Type = type;
+	msg.Sender = this;
 
 	TArray<FOverlapResult> res;
 	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_WorldDynamic, FCollisionShape::MakeSphere(4000)))
@@ -121,14 +123,14 @@ void ABaseGamer::SendGamerMessage(TSharedPtr<FGamerMessage> msg)
 	}
 }
 
-void ABaseGamer::ReceiveGamerMessage(TSharedPtr<class FGamerMessage> msg)
+void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 {
-	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && Cast<FGMRequestMemberJoin>(msg.Get()) && msg->Sender->Guild == this->Guild && msg->Sender->IsLeader)
+	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && msg.Type == GamerMessageType::GMT_RequestMemberJoin && msg.Sender->Guild == this->Guild && msg.Sender->IsLeader)
 	{
 		CurrentState = GamerState::GS_FollowingLeader;
 	}
 
-	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && Cast<FGMReportBossUp>(msg.Get()) && msg->Sender->Guild == this->Guild && IsLeader)
+	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && msg.Type == GamerMessageType::GMT_ReportBossUp && msg.Sender->Guild == this->Guild && IsLeader)
 	{
 		CurrentState = GamerState::GS_LookingForMore;
 	}

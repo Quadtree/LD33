@@ -1,21 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
-#include "GamerMessage.generated.h"
 
-enum class GamerMessageType
+enum class GamerMessageType : uint8
 {
 	GMT_ReportBossUp,
-	GMT_RequestMemberJoin
+	GMT_RequestMemberJoin,
+	GMT_Max
 };
 
-class LD33_API FGamerMessage
+struct LD33_API FGamerMessage
 {
-	GENERATED_BODY()
 public:
 	FString ToString();
 
 	class ABaseGamer* Sender;
+
+	GamerMessageType Type;
 
 protected:
 	FString RT(const char* a, const char* b)
@@ -62,23 +63,5 @@ protected:
 		case 5: return FString(e);
 		}
 		return FString("");
-	}
-};
-
-class LD33_API FGMReportBossUp : public FGamerMessage
-{
-public:
-	virtual FString ToString() override
-	{
-		return RT("lord flamenar is up", "flam is up", "i just noticed that LF is up");
-	}
-};
-
-class LD33_API FGMRequestMemberJoin : public FGamerMessage
-{
-public:
-	virtual FString ToString() override
-	{
-		return RT("lord flamenar is up", "flam is up", "LFM lord flam", "get in here!");
 	}
 };
