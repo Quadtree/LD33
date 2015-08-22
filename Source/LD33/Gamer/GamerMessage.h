@@ -6,6 +6,7 @@ enum class GamerMessageType : uint8
 {
 	GMT_ReportBossUp,
 	GMT_RequestMemberJoin,
+	GMT_AttackBossNow,
 	GMT_Max
 };
 

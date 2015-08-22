@@ -88,6 +88,7 @@ void AGuild::BeginPlay()
 			
 			if (g)
 			{
+				g->SpawnDefaultController();
 				g->Guild = this;
 				g->IsMale = FMath::RandBool();
 				g->IsLeader = isLeader;

@@ -14,6 +14,7 @@ enum class GamerState : uint8
 	GS_ReportingBossSighting,
 	GS_FollowingLeader,
 	GS_AttackingBoss,
+	GS_ApproachingBoss,
 	GS_PlayerVersusPlayer,
 	GS_LookingForMore,
 	GS_Max

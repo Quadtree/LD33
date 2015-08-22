@@ -4,6 +4,8 @@
 #include "BaseGamer.h"
 #include "LD33Character.h"
 #include "GamerMessage.h"
+#include "EngineUtils.h"
+#include "LD33HUD.h"
 
 
 // Sets default values
@@ -83,19 +85,56 @@ void ABaseGamer::UpdateState()
 					if (CurrentState == GamerState::GS_Farming || CurrentState == GamerState::GS_Scouting)
 					{
 						CurrentState = GamerState::GS_ReportingBossSighting;
-						return;
+						SendGamerMessage(GamerMessageType::GMT_ReportBossUp);
+						break;
 					}
-					if (CurrentState == GamerState::GS_AttackingBoss && IsLeader)
+
+					if (CurrentState != GamerState::GS_AttackingBoss && CurrentState == GamerState::GS_ApproachingBoss && IsLeader)
 					{
-						// send message indicating attack
-						return;
+						SendGamerMessage(GamerMessageType::GMT_AttackBossNow);
+						break;
 					}
-					if (CurrentState == GamerState::GS_IdleInTown)
+
+					// saw the boss while in town. just attack!
+					if (CurrentState != GamerState::GS_AttackingBoss && CurrentState == GamerState::GS_IdleInTown)
 					{
+						SendGamerMessage(GamerMessageType::GMT_AttackBossNow);
 						CurrentState = GamerState::GS_AttackingBoss;
-						return;
+						break;
 					}
 				}
+			}
+		}
+	}
+
+	if (CurrentState == GamerState::GS_ReportingBossSighting && IsLeader)
+	{
+		CurrentState = GamerState::GS_LookingForMore;
+	}
+
+	if (CurrentState == GamerState::GS_ReportingBossSighting || CurrentState == GamerState::GS_FollowingLeader)
+	{
+		ABaseGamer* leader = nullptr;
+
+		for (TActorIterator<ABaseGamer> i(GetWorld()); i; ++i)
+		{
+			if (i->Guild == Guild && i->IsLeader)
+			{
+				leader = *i;
+				break;
+			}
+		}
+
+		if (leader)
+		{
+			if (FVector::DistSquared(leader->GetActorLocation(), GetActorLocation()) > 750)
+			{
+				GetWorld()->GetNavigationSystem()->SimpleMoveToActor(GetController(), leader);
+			}
+			else
+			{
+				if (leader->CurrentState != GamerState::GS_LookingForMore || leader->CurrentState != GamerState::GS_ApproachingBoss || leader->CurrentState != GamerState::GS_AttackingBoss)
+				SendGamerMessage(GamerMessageType::GMT_ReportBossUp);
 			}
 		}
 	}
@@ -120,6 +159,11 @@ void ABaseGamer::SendGamerMessage(GamerMessageType type)
 				}
 			}
 		}
+	}
+
+	for (TActorIterator<ALD33HUD> i(GetWorld()); i; ++i)
+	{
+		i->AddChatMessage(GetActorLocation(), msg.ToString());
 	}
 }
 

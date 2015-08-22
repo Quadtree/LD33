@@ -65,6 +65,35 @@ void ALD33HUD::DrawHUD()
 			Canvas->DrawItem(mic);
 		}
 	}
+
+	for (int i = 0; i < ChatMessagePos.Num(); ++i)
+	{
+		if (GetWorld()->GetTimeSeconds() <= ChatMessageTimeLeft[i])
+		{
+			FVector pos = Project(ChatMessagePos[i]);
+
+			if (pos.X >= -200 && pos.Y >= -200 && pos.X <= Canvas->ClipX + 200 && pos.Y <= Canvas->ClipY + 200)
+			{
+				FCanvasTextItem txt(FVector2D(pos.X, pos.Y - 40), FText::FromString(ChatMessageText[i]), ChatMessageFont, FColor::White);
+				txt.bCentreX = true;
+				txt.ShadowColor = FColor::Black;
+				txt.ShadowOffset = FVector2D(1, -1);
+				Canvas->DrawItem(txt);
+			}
+		}
+		else
+		{
+			ChatMessagePos.RemoveAt(i);
+			ChatMessageText.RemoveAt(i);
+			ChatMessageTimeLeft.RemoveAt(i);
+			--i;
+		}
+	}
 }
 
-
+void ALD33HUD::AddChatMessage(FVector pos, FString text)
+{
+	ChatMessagePos.Add(pos);
+	ChatMessageText.Add(text);
+	ChatMessageTimeLeft.Add(GetWorld()->GetTimeSeconds() + (text.Len() * 0.08f));
+}

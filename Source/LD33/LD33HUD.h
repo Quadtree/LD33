@@ -17,4 +17,14 @@ class LD33_API ALD33HUD : public AHUD
 	
 	UPROPERTY(EditAnywhere, Category = Font)
 	class UFont* NametagFont;
+
+	UPROPERTY(EditAnywhere, Category = Font)
+	class UFont* ChatMessageFont;
+public:
+	void AddChatMessage(FVector pos, FString text);
+
+private:
+	TArray<FVector> ChatMessagePos;
+	TArray<float> ChatMessageTimeLeft;
+	TArray<FString> ChatMessageText;
 };
