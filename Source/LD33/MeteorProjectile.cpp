@@ -2,6 +2,7 @@
 
 #include "LD33.h"
 #include "MeteorProjectile.h"
+#include "Gamer/BaseGamer.h"
 
 
 // Sets default values
@@ -17,6 +18,7 @@ void AMeteorProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	OnActorHit.AddUniqueDynamic(this, &AMeteorProjectile::OnHit);
 }
 
 // Called every frame
@@ -26,3 +28,22 @@ void AMeteorProjectile::Tick( float DeltaTime )
 
 }
 
+void AMeteorProjectile::OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UE_LOG(LogTemp, Display, TEXT("METEOR HIT"));
+
+	TArray<FOverlapResult> res;
+
+	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(300)))
+	{
+		for (auto a : res)
+		{
+			if (a.Actor.IsValid() && Cast<ABaseGamer>(a.Actor.Get()))
+			{
+				a.Actor->TakeDamage(5000, FDamageEvent(), GetInstigator() ? GetInstigator()->GetController() : nullptr, this);
+			}
+		}
+	}
+
+	Destroy();
+}
