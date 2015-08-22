@@ -33,3 +33,18 @@ ALD33Character::ALD33Character()
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 }
+
+void ALD33Character::FrontalConeAttack(FVector targetPt)
+{
+	UE_LOG(LogTemp, Display, TEXT("Frontal cone attack at %s"), *targetPt.ToString());
+}
+
+void ALD33Character::SoulDrainAttack(AActor* target)
+{
+	UE_LOG(LogTemp, Display, TEXT("SoulDrainAttack at %s"), *target->GetName());
+}
+
+void ALD33Character::MeteorAttack(FVector targetPt)
+{
+	UE_LOG(LogTemp, Display, TEXT("MeteorAttack at %s"), *targetPt.ToString());
+}

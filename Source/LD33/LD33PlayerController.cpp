@@ -2,6 +2,8 @@
 
 #include "LD33.h"
 #include "LD33PlayerController.h"
+#include "LD33Character.h"
+#include "Gamer/BaseGamer.h"
 #include "AI/Navigation/NavigationSystem.h"
 
 ALD33PlayerController::ALD33PlayerController()
@@ -28,6 +30,10 @@ void ALD33PlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ALD33PlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ALD33PlayerController::OnSetDestinationReleased);
+
+	InputComponent->BindAction("FrontalConeAttack", IE_Pressed, this, &ALD33PlayerController::FrontalConeAttack);
+	InputComponent->BindAction("SoulDrainAttack", IE_Pressed, this, &ALD33PlayerController::SoulDrainAttack);
+	InputComponent->BindAction("MeteorAttack", IE_Pressed, this, &ALD33PlayerController::MeteorAttack);
 
 	// support touch devices 
 	InputComponent->BindTouch(EInputEvent::IE_Pressed, this, &ALD33PlayerController::MoveToTouchLocation);
@@ -87,4 +93,68 @@ void ALD33PlayerController::OnSetDestinationReleased()
 {
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
+}
+
+void ALD33PlayerController::FrontalConeAttack()
+{
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		auto chr = Cast<ALD33Character>(GetPawn());
+
+		if (chr) chr->FrontalConeAttack(Hit.ImpactPoint);
+	}
+}
+
+void ALD33PlayerController::SoulDrainAttack()
+{
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		TArray<FOverlapResult> res;
+
+		if (GetWorld()->OverlapMultiByChannel(res, Hit.ImpactPoint, FQuat::Identity, ECollisionChannel::ECC_Visibility, FCollisionShape::MakeSphere(500)))
+		{
+			float closestDistSquared = 10000000;
+			ABaseGamer* closest = nullptr;
+
+			for (auto a : res)
+			{
+				if (a.Actor.IsValid() && Cast<ABaseGamer>(a.Actor.Get()))
+				{
+					float distSquared = FVector::DistSquared(Hit.ImpactPoint, a.Actor->GetActorLocation());
+
+					if (distSquared < closestDistSquared)
+					{
+						closestDistSquared = distSquared;
+						closest = Cast<ABaseGamer>(a.Actor.Get());
+					}
+				}
+			}
+
+			if (closest)
+			{
+				auto chr = Cast<ALD33Character>(GetPawn());
+
+				if (chr) chr->SoulDrainAttack(closest);
+			}
+		}
+	}
+}
+
+void ALD33PlayerController::MeteorAttack()
+{
+	FHitResult Hit;
+	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		auto chr = Cast<ALD33Character>(GetPawn());
+
+		if (chr) chr->MeteorAttack(Hit.ImpactPoint);
+	}
 }

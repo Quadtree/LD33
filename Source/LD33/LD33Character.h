@@ -24,5 +24,9 @@ public:
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	void FrontalConeAttack(FVector targetPt);
+	void SoulDrainAttack(AActor* target);
+	void MeteorAttack(FVector targetPt);
 };
 

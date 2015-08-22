@@ -17,6 +17,13 @@ void ABaseGamer::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	MaxHealth = BaseMaxHealth;
+	Health = MaxHealth;
+	Armor = BaseArmor;
+	MeleeAttack = BaseMeleeAttack;
+	MagicAttack = BaseMagicAttack;
+	HealPower = BaseHealPower;
+
 }
 
 // Called every frame
@@ -33,3 +40,30 @@ void ABaseGamer::SetupPlayerInputComponent(class UInputComponent* InputComponent
 
 }
 
+float ABaseGamer::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (Damage > 0)
+	{
+		Damage = Damage * (1 - Armor);
+		Health -= Damage;
+
+		if (Health <= 0)
+		{
+			Respawn();
+		}
+	}
+	else
+	{
+		// prevent overhealing
+		Health = FMath::Min(Health - Damage, MaxHealth);
+	}
+
+	return Damage;
+}
+
+void ABaseGamer::Respawn()
+{
+	Health = MaxHealth;
+
+	SetActorLocation(FMath::RandPointInBox(FBox(FVector(-500, -500, -1000), FVector(500, 500, -1000))));
+}
