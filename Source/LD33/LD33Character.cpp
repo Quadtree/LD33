@@ -42,7 +42,10 @@ void ALD33Character::BeginPlay()
 	Super::BeginPlay();
 
 	Health = MaxHealth;
+
+	
 }
+
 
 void ALD33Character::Tick(float DeltaSeconds)
 {

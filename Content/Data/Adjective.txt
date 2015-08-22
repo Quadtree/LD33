@@ -8,3 +8,17 @@ Knightly
 Dragon
 Invisible
 Pernicious
+Astral
+Granite
+Diamond
+Crystal
+Blue
+Red
+Green
+Yellow
+Black
+White
+Cyan
+Fast
+Slow
+Smart

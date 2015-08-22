@@ -2,6 +2,8 @@
 
 #include "LD33.h"
 #include "BaseGamer.h"
+#include "LD33Character.h"
+#include "GamerMessage.h"
 
 
 // Sets default values
@@ -53,6 +55,83 @@ void ABaseGamer::BeginPlay()
 	}
 
 	BlueprintInit();
+
+	FTimerHandle h1, h2;
+
+	GetWorld()->GetTimerManager().SetTimer(h1, this, &ABaseGamer::UpdateMessageQueue, 0.5f, true, FMath::FRandRange(0, 0.5f));
+	GetWorld()->GetTimerManager().SetTimer(h2, this, &ABaseGamer::UpdateState, 1.f, true, FMath::FRandRange(0, 1.f));
+}
+
+
+void ABaseGamer::UpdateMessageQueue()
+{
+
+}
+
+void ABaseGamer::UpdateState()
+{
+	TArray<FOverlapResult> res;
+
+	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_WorldDynamic, FCollisionShape::MakeSphere(4000)))
+	{
+		for (auto a : res)
+		{
+			if (CurrentState == GamerState::GS_Farming || CurrentState == GamerState::GS_Scouting || CurrentState == GamerState::GS_IdleInTown || CurrentState == GamerState::GS_AttackingBoss)
+			{
+				if (ALD33Character* t = Cast<ALD33Character>(a.Actor.Get()))
+				{
+					if (CurrentState == GamerState::GS_Farming || CurrentState == GamerState::GS_Scouting)
+					{
+						CurrentState = GamerState::GS_ReportingBossSighting;
+						return;
+					}
+					if (CurrentState == GamerState::GS_AttackingBoss && IsLeader)
+					{
+						// send message indicating attack
+						return;
+					}
+					if (CurrentState == GamerState::GS_IdleInTown)
+					{
+						CurrentState = GamerState::GS_AttackingBoss;
+						return;
+					}
+				}
+			}
+		}
+	}
+}
+
+void ABaseGamer::SendGamerMessage(TSharedPtr<FGamerMessage> msg)
+{
+	msg->Sender = this;
+
+	TArray<FOverlapResult> res;
+	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_WorldDynamic, FCollisionShape::MakeSphere(4000)))
+	{
+		for (auto a : res)
+		{
+			if (a.Actor.Get() != this)
+			{
+				if (ABaseGamer* t = Cast<ABaseGamer>(a.Actor.Get()))
+				{
+					t->ReceiveGamerMessage(msg);
+				}
+			}
+		}
+	}
+}
+
+void ABaseGamer::ReceiveGamerMessage(TSharedPtr<class FGamerMessage> msg)
+{
+	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && Cast<FGMRequestMemberJoin>(msg.Get()) && msg->Sender->Guild == this->Guild && msg->Sender->IsLeader)
+	{
+		CurrentState = GamerState::GS_FollowingLeader;
+	}
+
+	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && Cast<FGMReportBossUp>(msg.Get()) && msg->Sender->Guild == this->Guild && IsLeader)
+	{
+		CurrentState = GamerState::GS_LookingForMore;
+	}
 }
 
 // Called every frame

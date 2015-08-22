@@ -92,6 +92,15 @@ void AGuild::BeginPlay()
 				g->IsMale = FMath::RandBool();
 				g->IsLeader = isLeader;
 				isLeader = false;
+
+				if (FVector::DistSquared(g->GetActorLocation(), FVector(0, 0, 0)) < FMath::Square(1000))
+				{
+					g->CurrentState = GamerState::GS_IdleInTown;
+				}
+				else
+				{
+					g->CurrentState = GamerState::GS_Scouting;
+				}
 			}
 		}
 		else

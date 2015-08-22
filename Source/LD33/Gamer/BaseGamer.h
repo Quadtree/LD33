@@ -5,10 +5,26 @@
 #include "GameFramework/Character.h"
 #include "BaseGamer.generated.h"
 
+enum class GamerState : uint8
+{
+	GS_IdleInTown,
+	GS_Farming,
+	GS_Scouting,
+	GS_ReportingBossSighting,
+	GS_FollowingLeader,
+	GS_AttackingBoss,
+	GS_PlayerVersusPlayer,
+	GS_LookingForMore,
+	GS_Max
+};
+
 UCLASS()
 class LD33_API ABaseGamer : public ACharacter
 {
 	GENERATED_BODY()
+private:
+	void UpdateMessageQueue();
+	void UpdateState();
 
 public:
 	// Sets default values for this character's properties
@@ -77,4 +93,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Init)
 	void BlueprintInit();
+
+	GamerState CurrentState;
+
+	void SendGamerMessage(TSharedPtr<class FGamerMessage> msg);
+	void ReceiveGamerMessage(TSharedPtr<class FGamerMessage> msg);
 };
