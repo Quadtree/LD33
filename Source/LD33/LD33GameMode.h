@@ -10,6 +10,19 @@ class ALD33GameMode : public AGameMode
 
 public:
 	ALD33GameMode();
+
+	void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, Category = Mob)
+	TArray<TSubclassOf<class AGenericMob>> MobTypes;
+
+	UPROPERTY(EditAnywhere, Category = Mob)
+	int32 MinMobs;
+
+	void RespawnMobs();
+
+	bool GetTerrainHeightAt(FVector2D pt, FVector& outHeight);
+	FVector GetPointOutsideOfTown();
 };
 
 

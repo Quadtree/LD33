@@ -92,13 +92,11 @@ void ABaseGamer::UpdateState()
 						CurrentState = GamerState::GS_ReportingBossSighting;
 						SendGamerMessage(GamerMessageType::GMT_ReportBossUp);
 					}
-
 					else if (CurrentState != GamerState::GS_AttackingBoss && CurrentState == GamerState::GS_ApproachingBoss && IsLeader)
 					{
 						SendGamerMessage(GamerMessageType::GMT_AttackBossNow);
 						CurrentState = GamerState::GS_AttackingBoss;
 					}
-
 					// saw the boss while in town. just attack!
 					else if (CurrentState != GamerState::GS_AttackingBoss && CurrentState == GamerState::GS_IdleInTown)
 					{
@@ -117,6 +115,11 @@ void ABaseGamer::UpdateState()
 					if (CurrentState == GamerState::GS_LookingForMore && t->CurrentState != GamerState::GS_FollowingLeader)
 					{
 						SendGamerMessage(GamerMessageType::GMT_RequestMemberJoin);
+					}
+
+					if (CurrentState == GamerState::GS_AttackingBoss && t->CurrentState != GamerState::GS_AttackingBoss && t->CurrentState != GamerState::GS_PlayerVersusPlayer)
+					{
+						SendGamerMessage(GamerMessageType::GMT_AttackBossNow);
 					}
 				}
 			}
@@ -211,6 +214,11 @@ void ABaseGamer::UpdateState()
 		for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
 		{
 			if (MeleeAttack > HealPower || MagicAttack > HealPower) Attack(*i);
+
+			if (i->Health <= 0)
+			{
+				CurrentState = GamerState::GS_PlayerVersusPlayer;
+			}
 		}
 	}
 }
@@ -289,7 +297,7 @@ void ABaseGamer::Attack(AActor* target)
 		}
 		else
 		{
-			target->TakeDamage(MeleeAttack * 1200, FDamageEvent(), c, this);
+			target->TakeDamage(MeleeAttack * 2400, FDamageEvent(), c, this);
 		}
 	}
 	else 
@@ -308,7 +316,7 @@ void ABaseGamer::Attack(AActor* target)
 			{
 				ib->Target = target;
 				ib->Align();
-				ib->DamageOnHit = MagicAttack * 1400;
+				ib->DamageOnHit = MagicAttack * 2800;
 			}
 		}
 	}

@@ -7,6 +7,7 @@
 #include "EngineUtils.h"
 #include "Gamer/BaseGamer.h"
 #include "Guild.h"
+#include "GenericMob.h"
 #include "LD33Character.h"
 
 void ALD33HUD::DrawHUD()
@@ -29,32 +30,49 @@ void ALD33HUD::DrawHUD()
 	const float HEALTH_BAR_BORDER_SIZE = 2;
 
 	// draw nametags
-	for (TActorIterator<ABaseGamer> i(GetWorld()); i; ++i)
+	for (TActorIterator<AActor> i(GetWorld()); i; ++i)
 	{
 		FVector pos = Project(i->GetActorLocation());
 
 		if (pos.X >= -200 && pos.Y >= -200 && pos.X <= Canvas->ClipX + 200 && pos.Y <= Canvas->ClipY + 200)
 		{
+			float health = -1;
+			float maxHealth = -1;
+
+			if (auto gm = Cast<ABaseGamer>(*i))
 			{
-				FCanvasTextItem txt(FVector2D(pos.X, pos.Y - 70), FText::FromString(i->GamerName), NametagFont, FColor::Red);
-				txt.bCentreX = true;
-				Canvas->DrawItem(txt);
+				{
+					FCanvasTextItem txt(FVector2D(pos.X, pos.Y - 70), FText::FromString(gm->GamerName), NametagFont, FColor::Red);
+					txt.bCentreX = true;
+					Canvas->DrawItem(txt);
+				}
+
+				{
+					FCanvasTextItem txt(FVector2D(pos.X, pos.Y - 50), FText::FromString("<" + (gm->Guild ? gm->Guild->GuildName : "???") + ">"), NametagFont, FColor::Red);
+					txt.bCentreX = true;
+					Canvas->DrawItem(txt);
+				}
+				health = gm->Health;
+				maxHealth = gm->MaxHealth;
 			}
 
+			if (auto fi = Cast<AGenericMob>(*i))
 			{
-				FCanvasTextItem txt(FVector2D(pos.X, pos.Y - 50), FText::FromString("<" + (i->Guild ? i->Guild->GuildName : "???") + ">"), NametagFont, FColor::Red);
-				txt.bCentreX = true;
-				Canvas->DrawItem(txt);
+				health = fi->Health;
+				maxHealth = fi->MaxHealth;
 			}
 
+			if (maxHealth > 0)
 			{
-				FCanvasTileItem bx(FVector2D(pos.X, pos.Y - 20) - (overheadHealthBarSize / 2), overheadHealthBarSize, FColor::Black);
-				Canvas->DrawItem(bx);
-			}
+				{
+					FCanvasTileItem bx(FVector2D(pos.X, pos.Y - 20) - (overheadHealthBarSize / 2), overheadHealthBarSize, FColor::Black);
+					Canvas->DrawItem(bx);
+				}
 
-			{
-				FCanvasTileItem bx(FVector2D(pos.X, pos.Y - 20) - (overheadHealthBarSize / 2) + FVector2D(1, 1), (overheadHealthBarSize - FVector2D(2, 2)) * FVector2D(i->Health / i->MaxHealth, 1), FColor::Red);
-				Canvas->DrawItem(bx);
+				{
+					FCanvasTileItem bx(FVector2D(pos.X, pos.Y - 20) - (overheadHealthBarSize / 2) + FVector2D(1, 1), (overheadHealthBarSize - FVector2D(2, 2)) * FVector2D(FMath::Max(health, 0.f) / maxHealth, 1), FColor::Red);
+					Canvas->DrawItem(bx);
+				}
 			}
 		}
 
@@ -98,11 +116,18 @@ void ALD33HUD::DrawHUD()
 		Canvas->DrawItem(mic);
 	}
 
+	for (TActorIterator<AGenericMob> i(GetWorld()); i; ++i)
+	{
+		FCanvasTileItem mic(minimapPos + FVector2D((i->GetActorLocation().Y + worldHalfSize.Y) / (worldHalfSize.Y * 2) * minimapSize.X, minimapSize.Y - (i->GetActorLocation().X + worldHalfSize.X) / (worldHalfSize.X * 2) * minimapSize.Y) - FVector2D(1, 1), FVector2D(3, 3), FColor::Green);
+
+		Canvas->DrawItem(mic);
+	}
+
 	ALD33Character* ch = nullptr;
 	
 	for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
 	{
-		FCanvasTileItem mic(minimapPos + FVector2D((i->GetActorLocation().Y + worldHalfSize.Y) / (worldHalfSize.Y * 2) * minimapSize.X, minimapSize.Y - (i->GetActorLocation().X + worldHalfSize.X) / (worldHalfSize.X * 2) * minimapSize.Y) - FVector2D(4, 4), FVector2D(8, 8), FColor::Green);
+		FCanvasTileItem mic(minimapPos + FVector2D((i->GetActorLocation().Y + worldHalfSize.Y) / (worldHalfSize.Y * 2) * minimapSize.X, minimapSize.Y - (i->GetActorLocation().X + worldHalfSize.X) / (worldHalfSize.X * 2) * minimapSize.Y) - FVector2D(4, 4), FVector2D(8, 8), FColor::White);
 		Canvas->DrawItem(mic);
 		ch = *i;
 	}
