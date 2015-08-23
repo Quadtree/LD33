@@ -125,4 +125,10 @@ public:
 
 	void SendInsult();
 	void SendPunish();
+
+	UPROPERTY(BlueprintReadOnly, Category = Stats)
+	FLinearColor HairColor;
+
+	UPROPERTY(BlueprintReadOnly, Category = Stats)
+	float SkinLightness;
 };

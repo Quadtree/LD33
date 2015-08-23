@@ -34,8 +34,8 @@ ALD33Character::ALD33Character()
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	MaxHealth = 220000;
-	MaxMana = 100000;
+	MaxHealth = 200000;
+	MaxMana = 150000;
 }
 
 void ALD33Character::BeginPlay()

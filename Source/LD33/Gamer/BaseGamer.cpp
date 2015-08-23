@@ -43,7 +43,7 @@ void ABaseGamer::GamerInit()
 
 	FFileHelper::LoadANSITextFileToStrings(*(FPaths::GameContentDir() + "Data/NameSyllables.txt"), nullptr, syl);
 
-	if (syl.Num())
+	if (syl.Num() && GamerName.Len() == 0)
 	{
 		while (true)
 		{
@@ -67,11 +67,21 @@ void ABaseGamer::GamerInit()
 		UE_LOG(LogLD33, Display, TEXT("Name: %s"), *GamerName);
 	}
 
+	if (SkinLightness < 0.01f)
+	{
+		SkinLightness = FMath::FRandRange(0.25f, 1.f);
+
+		HairColor.R = FMath::FRandRange(0.f, 1.f);
+		HairColor.G = FMath::FRandRange(0.f, 1.f);
+		HairColor.B = FMath::FRandRange(0.f, 1.f);
+		HairColor.A = 1;
+	}
+
 	BlueprintInit();
 
 	FTimerHandle h1, h2;
 
-	GetWorld()->GetTimerManager().SetTimer(h1, this, &ABaseGamer::UpdateMessageQueue, 0.5f, true, FMath::FRandRange(0, 0.5f));
+	//GetWorld()->GetTimerManager().SetTimer(h1, this, &ABaseGamer::UpdateMessageQueue, 0.5f, true, FMath::FRandRange(0, 0.5f));
 	GetWorld()->GetTimerManager().SetTimer(h2, this, &ABaseGamer::UpdateState, 1.f, true, FMath::FRandRange(0, 1.f));
 }
 
@@ -461,7 +471,7 @@ void ABaseGamer::Attack(AActor* target)
 		}
 		else
 		{
-			target->TakeDamage(MeleeAttack * 2400, FDamageEvent(), c, this);
+			target->TakeDamage(MeleeAttack * 4500, FDamageEvent(), c, this);
 			OnMeleeAttack(target);
 			IsCurrentlyAttacking = true;
 		}
@@ -484,7 +494,7 @@ void ABaseGamer::Attack(AActor* target)
 			{
 				ib->Target = target;
 				ib->Align();
-				ib->DamageOnHit = MagicAttack * 3500;
+				ib->DamageOnHit = MagicAttack * 5000;
 			}
 
 			IsCurrentlyAttacking = true;
@@ -564,20 +574,45 @@ float ABaseGamer::TakeDamage(float Damage, struct FDamageEvent const& DamageEven
 
 void ABaseGamer::Respawn()
 {
-	GetMovementComponent()->SetActive(true);
+	//GetMovementComponent()->SetActive(true);
 
-	Health = MaxHealth;
+	//Health = MaxHealth;
 
-	FHitResult hit;
+	//FHitResult hit;
 
-	SetActorLocation(Guild->GetPointInTown());
-	CurrentState = GamerState::GS_Scouting;
+	//SetActorLocation(Guild->GetPointInTown());
+	//CurrentState = GamerState::GS_Scouting;
 
-	GetMesh()->SetSimulatePhysics(false);
-	GetMesh()->SetSkeletalMesh(GetMesh()->GetSkeletalMesh());
+	//GetMesh()->SetSimulatePhysics(false);
+	//GetMesh()->SetSkeletalMesh(GetMesh()->GetSkeletalMesh());
 	
 	//GetMesh()->SetWorldRotation(GetRootComponent()->GetComponentRotation().Quaternion() + OriginalMeshTransform.GetRotation());
 	//GetMesh()->SetWorldLocation(GetRootComponent()->GetComponentLocation() + OriginalMeshTransform.GetLocation());
 
 	//GetMesh()->AttachTo(GetRootComponent());
+
+	for (int i = 0; i < 100; ++i)
+	{
+		FVector np = Guild->GetPointInTown();
+
+		ABaseGamer* rp = GetWorld()->SpawnActor<ABaseGamer>(this->GetClass(), np, FRotator::ZeroRotator);
+
+		if (!rp) continue;
+
+		rp->Guild = Guild;
+		rp->GamerName = GamerName;
+		rp->HairColor = HairColor;
+		rp->SkinLightness = SkinLightness;
+		rp->IsLeader = IsLeader;
+		rp->IsMale = IsMale;
+		rp->SpawnDefaultController();
+
+		rp->GamerInit();
+
+		check(rp->Health > 0);
+
+		break;
+	}
+
+	Destroy();
 }
