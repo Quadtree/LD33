@@ -400,14 +400,22 @@ float ABaseGamer::TakeDamage(float Damage, struct FDamageEvent const& DamageEven
 {
 	if (Damage > 0)
 	{
-		Damage = Damage * (1 - Armor);
-		Health -= Damage;
-
-		if (Health <= 0)
+		if (Health > 0)
 		{
-			RespawnTimer = 10;
-			GetMovementComponent()->SetActive(false);
-			GetMesh()->SetSimulatePhysics(true);
+			Damage = Damage * (1 - Armor);
+			Health -= Damage;
+
+			if (Health <= 0)
+			{
+				RespawnTimer = 10;
+				GetMovementComponent()->SetActive(false);
+				GetMesh()->SetSimulatePhysics(true);
+
+				for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
+				{
+					i->Kills++;
+				}
+			}
 		}
 	}
 	else

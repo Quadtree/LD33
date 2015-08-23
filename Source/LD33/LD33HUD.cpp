@@ -195,6 +195,11 @@ void ALD33HUD::DrawHUD()
 			Canvas->DrawItem(txt);
 		}
 	}
+
+	{
+		FCanvasTextItem txt(healthBarsPos - FVector2D(0, 40), FText::FromString(FString("Kills: ") + FString::FromInt(ch->Kills)), ChatMessageFont, FColor::White);
+		Canvas->DrawItem(txt);
+	}
 }
 
 void ALD33HUD::AddChatMessage(FVector pos, FString text)
