@@ -45,7 +45,7 @@ void AMeteorProjectile::OnHit(AActor* SelfActor, AActor* OtherActor, FVector Nor
 		}
 	}
 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 300, 16, FColor::Red, false, 1);
+	//DrawDebugSphere(GetWorld(), GetActorLocation(), 300, 16, FColor::Red, false, 1);
 
 	Destroy();
 }

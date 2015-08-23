@@ -58,5 +58,12 @@ public:
 	void OnDeath();
 
 	bool UseMana(float qty);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Death)
+	void OnConeAttack();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Death)
+	void OnSoulDrain(class AActor* target);
+
 };
 

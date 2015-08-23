@@ -105,6 +105,8 @@ void ALD33Character::FrontalConeAttack(FVector targetPt)
 
 	UE_LOG(LogTemp, Display, TEXT("Frontal cone attack at %s"), *targetPt.ToString());
 
+	OnConeAttack();
+
 	FVector deltaToPt = targetPt - GetActorLocation();
 	deltaToPt.Z = 0;
 	deltaToPt.Normalize();
@@ -148,6 +150,8 @@ void ALD33Character::SoulDrainAttack(AActor* target)
 
 	if (target)
 	{
+		OnSoulDrain(target);
+
 		UE_LOG(LogTemp, Display, TEXT("SoulDrainAttack at %s"), *target->GetName());
 
 		float initialHp = 100000;
@@ -174,7 +178,7 @@ void ALD33Character::MeteorAttack(FVector targetPt)
 
 	UE_LOG(LogTemp, Display, TEXT("MeteorAttack at %s"), *targetPt.ToString());
 
-	AMeteorProjectile* prj = GetWorld()->SpawnActor<AMeteorProjectile>(MeteorProjectileType, targetPt + FVector(0, 0, 5000), FRotator::ZeroRotator);
+	AMeteorProjectile* prj = GetWorld()->SpawnActor<AMeteorProjectile>(MeteorProjectileType, targetPt + FVector(0, 0, 5000), FRotator(90, 0, 0));
 	
 	if (prj)
 	{
