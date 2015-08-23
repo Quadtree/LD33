@@ -64,7 +64,7 @@ void ALD33Character::Tick(float DeltaSeconds)
 		{
 			if (auto g = Cast<ABaseGamer>(a.Actor.Get()))
 			{
-				Mana = FMath::Min(Mana + DeltaSeconds * 150, MaxMana);
+				Mana = FMath::Min(Mana + DeltaSeconds * 200, MaxMana);
 			}
 		}
 	}
@@ -177,7 +177,7 @@ void ALD33Character::MeteorAttack(FVector targetPt)
 {
 	if (AbilityCooldown > 0 || Health <= 0) return;
 
-	if (!UseMana(15000)) return;
+	if (!UseMana(8000)) return;
 
 	UE_LOG(LogTemp, Display, TEXT("MeteorAttack at %s"), *targetPt.ToString());
 
