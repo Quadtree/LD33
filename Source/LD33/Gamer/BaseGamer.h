@@ -121,6 +121,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = Spell)
 	void OnMeleeAttack(AActor* target);
 
+	UPROPERTY()
 	class AGuild* LastInsultedMe;
 
 	void SendInsult();

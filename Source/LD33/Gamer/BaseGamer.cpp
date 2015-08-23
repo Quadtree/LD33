@@ -237,7 +237,8 @@ void ABaseGamer::UpdateState()
 		{
 			if (FVector::DistSquared(leader->GetActorLocation(), GetActorLocation()) > FMath::Square(750))
 			{
-				GetWorld()->GetNavigationSystem()->SimpleMoveToActor(GetController(), leader);
+				if (leader && leader->IsValidLowLevel() && !leader->IsPendingKill())
+					GetWorld()->GetNavigationSystem()->SimpleMoveToActor(GetController(), leader);
 			}
 			else
 			{
@@ -281,7 +282,8 @@ void ABaseGamer::UpdateState()
 		}
 		else
 		{
-			GetWorld()->GetNavigationSystem()->SimpleMoveToActor(GetController(), nearest);
+			if (nearest && nearest->IsValidLowLevel() && !nearest->IsPendingKill())
+				GetWorld()->GetNavigationSystem()->SimpleMoveToActor(GetController(), nearest);
 		}
 	}
 
@@ -292,8 +294,14 @@ void ABaseGamer::UpdateState()
 		{ 
 			if (auto c = Cast<AAIController>(GetController()))
 			{
-				auto t = c->MoveToActor(*i, 1000);
-				UE_LOG(LogLD33, Display, TEXT("%s approaching %s (%s)"), *GetName(), *i->GetName(), *FString::FromInt((int32)t));
+				if (c->IsValidLowLevel() && !c->IsPendingKill())
+				{
+					if (i->IsValidLowLevel() && !i->IsPendingKill())
+					{
+						auto t = c->MoveToActor(*i, 1000);
+						UE_LOG(LogLD33, Display, TEXT("%s approaching %s (%s)"), *GetName(), *i->GetName(), *FString::FromInt((int32)t));
+					}
+				}
 			}
 		}
 	}
@@ -315,7 +323,8 @@ void ABaseGamer::UpdateState()
 	{
 		if (auto c = Cast<AAIController>(GetController()))
 		{
-			auto t = c->MoveToLocation(Guild->GetPointOutsideOfTown(), 500);
+			if (c->IsValidLowLevel() && !c->IsPendingKill())
+				auto t = c->MoveToLocation(Guild->GetPointOutsideOfTown(), 500);
 		}
 	}
 
@@ -337,7 +346,8 @@ void ABaseGamer::UpdateState()
 			if (auto c = Cast<AAIController>(GetController()))
 			{
 				// try to stay within 30m
-				auto t = c->MoveToLocation(nearestEnemy->GetActorLocation(), 3000);
+				if (c->IsValidLowLevel() && !c->IsPendingKill())
+					auto t = c->MoveToLocation(nearestEnemy->GetActorLocation(), 3000);
 			}
 
 			GetCharacterMovement()->SetAvoidanceEnabled(true);
@@ -354,7 +364,8 @@ void ABaseGamer::UpdateState()
 			if (auto c = Cast<AAIController>(GetController()))
 			{
 				// GET OUT THE WAY
-				auto t = c->MoveToLocation(FMath::RandPointInBox(FBox(FVector(-800,-800,0), FVector(800,800,0))) + GetActorLocation());
+				if (c->IsValidLowLevel() && !c->IsPendingKill())
+					auto t = c->MoveToLocation(FMath::RandPointInBox(FBox(FVector(-800,-800,0), FVector(800,800,0))) + GetActorLocation());
 			}
 		}
 	}
@@ -467,7 +478,8 @@ void ABaseGamer::Attack(AActor* target)
 	{
 		if (rangeToTargetSquared > FMath::Square(600))
 		{
-			c->MoveToActor(target, 150);
+			if (target && target->IsValidLowLevel() && !target->IsPendingKill())
+				c->MoveToActor(target, 150);
 		}
 		else
 		{
@@ -482,7 +494,8 @@ void ABaseGamer::Attack(AActor* target)
 
 		if (rangeToTargetSquared > FMath::Square(2500))
 		{
-			c->MoveToActor(target, 2400);
+			if (c && c->IsValidLowLevel() && !c->IsPendingKill() && target && target->IsValidLowLevel() && !target->IsPendingKill())
+				c->MoveToActor(target, 2400);
 		}
 		else
 		{

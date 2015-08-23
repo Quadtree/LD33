@@ -165,7 +165,7 @@ void ALD33Character::SoulDrainAttack(AActor* target)
 
 		if (actualDamage >= initialHp)
 		{
-			Health = FMath::Clamp(Health + 15000, 0.f, MaxHealth);
+			Health = FMath::Clamp(Health + 25000, 0.f, MaxHealth);
 			UE_LOG(LogTemp, Display, TEXT("Successful soul drain"));
 		}
 

@@ -35,6 +35,7 @@ public:
 
 	FVector InitialAggroPoint;
 
+	UPROPERTY()
 	AActor* AggroedOn;
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;

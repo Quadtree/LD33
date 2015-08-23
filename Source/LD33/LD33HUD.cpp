@@ -140,6 +140,10 @@ void ALD33HUD::DrawHUD()
 		ch = *i;
 	}
 
+	float ablCooldown = 0;
+
+	if (ch) ablCooldown = ch->AbilityCooldown;
+
 	// draw the abilities
 	for (int32 i = 0; i < AbilityTextures.Num(); ++i)
 	{
@@ -150,7 +154,7 @@ void ALD33HUD::DrawHUD()
 		}
 
 		{
-			FCanvasTileItem bx(FVector2D(350 + i * 70, Canvas->ClipY - 330 + (60 - (FMath::Clamp(ch->AbilityCooldown, 0.f, 1.f) * 60))), FVector2D(60, FMath::Clamp(ch->AbilityCooldown, 0.f, 1.f) * 60), FColor(0, 0, 0, 128));
+			FCanvasTileItem bx(FVector2D(350 + i * 70, Canvas->ClipY - 330 + (60 - (FMath::Clamp(ablCooldown, 0.f, 1.f) * 60))), FVector2D(60, FMath::Clamp(ablCooldown, 0.f, 1.f) * 60), FColor(0, 0, 0, 128));
 			bx.BlendMode = ESimpleElementBlendMode::SE_BLEND_AlphaBlend;
 			Canvas->DrawItem(bx);
 		}

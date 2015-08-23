@@ -47,7 +47,7 @@ void ALD33GameMode::RespawnMobs()
 
 	while (count < MinMobs)
 	{
-		auto m = GetWorld()->SpawnActor<AGenericMob>(MobTypes[FMath::Rand() % MobTypes.Num()], GetPointOutsideOfTown(), FRotator::ZeroRotator);
+		auto m = GetWorld()->SpawnActor<AGenericMob>(MobTypes[FMath::Rand() % MobTypes.Num()], GetPointOutsideOfTown() + FVector(0,0,400), FRotator::ZeroRotator);
 		if(m) m->SpawnDefaultController();
 
 		++count;

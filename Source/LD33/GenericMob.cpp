@@ -31,7 +31,7 @@ void AGenericMob::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	if (GetActorLocation().SizeSquared2D() < FMath::Square(2000)) Destroy();
+	if (GetActorLocation().SizeSquared2D() < FMath::Square(3500)) Destroy();
 }
 
 // Called to bind functionality to input
@@ -65,9 +65,18 @@ void AGenericMob::ScanArea()
 	}
 	else
 	{
+		if (auto t = Cast<ABaseGamer>(AggroedOn))
+		{
+			if (t->Health <= 0)
+			{
+				AggroedOn = nullptr;
+				return;
+			}
+		}
+
 		auto c = Cast<AAIController>(GetController());
 
-		if (c)
+		if (c && c->IsValidLowLevel() && !c->IsPendingKill() && AggroedOn && AggroedOn->IsValidLowLevel() && !AggroedOn->IsPendingKill())
 		{
 			if (c->MoveToActor(AggroedOn, 150) == EPathFollowingRequestResult::AlreadyAtGoal)
 			{
