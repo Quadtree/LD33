@@ -10,6 +10,7 @@
 #include "AIController.h"
 #include "IceBolt.h"
 #include "MeteorProjectile.h"
+#include "GenericMob.h"
 
 
 // Sets default values
@@ -95,12 +96,38 @@ void ABaseGamer::UpdateState()
 	float mostDamagedAllyHealth = FLT_MAX;
 	AActor* mostDamagedAlly = nullptr;
 
+	float distToNearestEnemey = FLT_MAX;
+	AActor* nearestEnemy = nullptr;
+
 	AGuild* detectedKSer = nullptr;
 
 	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_WorldDynamic, FCollisionShape::MakeSphere(4000)))
 	{
 		for (auto a : res)
 		{
+			bool isEnemy = false;
+
+			if (CurrentState == GamerState::GS_Farming && Cast<AGenericMob>(a.Actor.Get()) && Cast<AGenericMob>(a.Actor.Get())->Health > 0)
+			{
+				isEnemy = true;
+			}
+
+			if (CurrentState == GamerState::GS_PlayerVersusPlayer && Cast<ABaseGamer>(a.Actor.Get()) && Cast<ABaseGamer>(a.Actor.Get())->Guild != Guild && Cast<ABaseGamer>(a.Actor.Get())->Health > 0)
+			{
+				isEnemy = true;
+			}
+
+			if (isEnemy)
+			{
+				float dist = FVector::DistSquared(a.Actor->GetActorLocation(), GetActorLocation());
+				
+				if (dist < distToNearestEnemey)
+				{
+					distToNearestEnemey = dist;
+					nearestEnemy = a.Actor.Get();
+				}
+			}
+
 			if (CurrentState == GamerState::GS_Farming || CurrentState == GamerState::GS_Scouting || CurrentState == GamerState::GS_IdleInTown || CurrentState == GamerState::GS_AttackingBoss || CurrentState == GamerState::GS_ApproachingBoss)
 			{
 				if (ALD33Character* t = Cast<ALD33Character>(a.Actor.Get()))
@@ -260,27 +287,32 @@ void ABaseGamer::UpdateState()
 	{
 		for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
 		{
-			if (MeleeAttack > HealPower || MagicAttack > HealPower)
-			{
-				Attack(*i);
-			}
-			else
-			{
-				// if we get here it means i am a healer
-				if (auto c = Cast<AAIController>(GetController()))
-				{
-					// try to stay within 30m
-					auto t = c->MoveToLocation(i->GetActorLocation(), 3000);
-				}
-
-				GetCharacterMovement()->SetAvoidanceEnabled(true);
-			}
-			
+			nearestEnemy = *i;
 
 			if (i->Health <= 0)
 			{
 				CurrentState = GamerState::GS_PlayerVersusPlayer;
 			}
+		}
+	}
+
+	if (nearestEnemy)
+	{
+		
+		if (MeleeAttack > HealPower || MagicAttack > HealPower)
+		{
+			Attack(nearestEnemy);
+		}
+		else
+		{
+			// if we get here it means i am a healer
+			if (auto c = Cast<AAIController>(GetController()))
+			{
+				// try to stay within 30m
+				auto t = c->MoveToLocation(nearestEnemy->GetActorLocation(), 3000);
+			}
+
+			GetCharacterMovement()->SetAvoidanceEnabled(true);
 		}
 	}
 }
@@ -474,6 +506,16 @@ float ABaseGamer::TakeDamage(float Damage, struct FDamageEvent const& DamageEven
 			if (Cast<AMeteorProjectile>(DamageCauser) && FMath::RandBool())
 			{
 				SendGamerMessage(GamerMessageType::GMT_Excuse);
+			}
+
+			if (Cast<AGenericMob>(DamageCauser))
+			{
+				CurrentState = GamerState::GS_Farming;
+			}
+
+			if (Cast<ABaseGamer>(DamageCauser))
+			{
+				CurrentState = GamerState::GS_PlayerVersusPlayer;
 			}
 		}
 	}
