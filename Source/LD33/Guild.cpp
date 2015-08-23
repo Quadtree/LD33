@@ -96,7 +96,7 @@ void AGuild::BeginPlay()
 				g->IsLeader = isLeader;
 				isLeader = false;
 
-				if (FVector::DistSquared(g->GetActorLocation(), FVector(0, 0, 0)) < FMath::Square(1000))
+				if (FVector::DistSquared(g->GetActorLocation(), FVector(0, 0, 0)) < FMath::Square(4000))
 				{
 					g->CurrentState = GamerState::GS_IdleInTown;
 				}
@@ -129,7 +129,7 @@ bool AGuild::GetTerrainHeightAt(FVector2D pt, FVector& outHeight)
 	{
 		if (hit.Actor.IsValid() && Cast<ALandscape>(hit.Actor.Get()))
 		{
-			outHeight = hit.ImpactPoint;
+			outHeight = hit.ImpactPoint + FVector(0,0,300);
 			return true;
 		}
 	}

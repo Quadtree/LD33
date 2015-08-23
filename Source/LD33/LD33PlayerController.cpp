@@ -124,7 +124,7 @@ void ALD33PlayerController::SoulDrainAttack()
 
 			for (auto a : res)
 			{
-				if (a.Actor.IsValid() && Cast<ABaseGamer>(a.Actor.Get()))
+				if (a.Actor.IsValid() && Cast<ABaseGamer>(a.Actor.Get()) && Cast<ABaseGamer>(a.Actor.Get())->Health > 0)
 				{
 					float distSquared = FVector::DistSquared(Hit.ImpactPoint, a.Actor->GetActorLocation());
 

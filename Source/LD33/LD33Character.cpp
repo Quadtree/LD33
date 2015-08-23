@@ -134,7 +134,7 @@ void ALD33Character::FrontalConeAttack(FVector targetPt)
 
 				if (FMath::Abs(ang) < 0.3f && ang2 > 0)
 				{
-					a.Actor->TakeDamage(4500, FDamageEvent(), GetController(), this);
+					a.Actor->TakeDamage(FMath::FRandRange(3000,7000), FDamageEvent(), GetController(), this);
 				}
 			}
 		}

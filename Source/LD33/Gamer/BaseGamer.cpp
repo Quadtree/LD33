@@ -93,6 +93,8 @@ void ABaseGamer::UpdateMessageQueue()
 
 void ABaseGamer::UpdateState()
 {
+	if (CurrentState == GamerState::GS_PlayerVersusPlayer && GetActorLocation().SizeSquared2D() < FMath::Square(2000)) CurrentState = GamerState::GS_IdleInTown;
+
 	GetCharacterMovement()->SetAvoidanceEnabled(false);
 
 	if (Health <= 0) return;
@@ -211,7 +213,7 @@ void ABaseGamer::UpdateState()
 
 	if (mostDamagedAlly)
 	{
-		mostDamagedAlly->TakeDamage(-2000, FDamageEvent(), GetController(), this);
+		mostDamagedAlly->TakeDamage(-1200, FDamageEvent(), GetController(), this);
 		OnCastHeal(mostDamagedAlly);
 	}
 
@@ -460,7 +462,8 @@ void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 			else
 			{
 				// reply WITH VIOLENCE
-				CurrentState = GamerState::GS_PlayerVersusPlayer;
+				if (GetActorLocation().SizeSquared2D() > FMath::Square(2000))
+					CurrentState = GamerState::GS_PlayerVersusPlayer;
 			}
 		}
 	}
@@ -573,6 +576,13 @@ float ABaseGamer::TakeDamage(float Damage, struct FDamageEvent const& DamageEven
 			if (Cast<ABaseGamer>(DamageCauser))
 			{
 				CurrentState = GamerState::GS_PlayerVersusPlayer;
+			}
+
+			if (EventInstigator && Cast<APlayerController>(EventInstigator) && IsLeader && FMath::RandRange(1, 4) == 1)
+			{
+				// taking too much damage, just attack
+				SendGamerMessage(GamerMessageType::GMT_AttackBossNow);
+				CurrentState = GamerState::GS_AttackingBoss;
 			}
 		}
 	}

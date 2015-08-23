@@ -70,7 +70,7 @@ void ALD33HUD::DrawHUD()
 				}
 
 				{
-					FCanvasTileItem bx(FVector2D(pos.X, pos.Y - 20) - (overheadHealthBarSize / 2) + FVector2D(1, 1), (overheadHealthBarSize - FVector2D(2, 2)) * FVector2D(FMath::Max(health, 0.f) / maxHealth, 1), FColor::Red);
+					FCanvasTileItem bx(FVector2D(pos.X, pos.Y - 20) - (overheadHealthBarSize / 2) + FVector2D(1, 1), (overheadHealthBarSize - FVector2D(2, 2)) * FVector2D(FMath::Max(health, 0.f) / maxHealth, 1), Cast<AGenericMob>(*i) ? FColor::Green : FColor::Red);
 					Canvas->DrawItem(bx);
 				}
 			}
