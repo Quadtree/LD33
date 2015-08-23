@@ -529,6 +529,7 @@ float ABaseGamer::TakeDamage(float Damage, struct FDamageEvent const& DamageEven
 				RespawnTimer = 10;
 				GetMovementComponent()->SetActive(false);
 				GetMesh()->SetSimulatePhysics(true);
+				GetMesh()->SetPhysicsBlendWeight(1);
 
 				for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
 				{
@@ -569,12 +570,14 @@ void ABaseGamer::Respawn()
 
 	FHitResult hit;
 
-	GetWorld()->LineTraceSingleByChannel(hit, FVector(0, 0, 50000), FVector(0, 0, 0), ECollisionChannel::ECC_WorldStatic);
-
-	SetActorLocation(FMath::RandPointInBox(FBox(FVector(-500, -500, hit.ImpactPoint.Z), FVector(500, 500, hit.ImpactPoint.Z))));
+	SetActorLocation(Guild->GetPointInTown());
 	CurrentState = GamerState::GS_Scouting;
 
 	GetMesh()->SetSimulatePhysics(false);
-	GetMesh()->SetWorldRotation(GetRootComponent()->GetComponentRotation().Quaternion() + OriginalMeshTransform.GetRotation());
-	GetMesh()->SetWorldLocation(GetRootComponent()->GetComponentLocation() + OriginalMeshTransform.GetLocation());
+	GetMesh()->SetSkeletalMesh(GetMesh()->GetSkeletalMesh());
+	
+	//GetMesh()->SetWorldRotation(GetRootComponent()->GetComponentRotation().Quaternion() + OriginalMeshTransform.GetRotation());
+	//GetMesh()->SetWorldLocation(GetRootComponent()->GetComponentLocation() + OriginalMeshTransform.GetLocation());
+
+	//GetMesh()->AttachTo(GetRootComponent());
 }

@@ -31,6 +31,7 @@ void AGenericMob::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	if (GetActorLocation().SizeSquared2D() < FMath::Square(2000)) Destroy();
 }
 
 // Called to bind functionality to input
