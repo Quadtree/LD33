@@ -22,3 +22,11 @@ Cyan
 Fast
 Slow
 Smart
+Titanic
+Ancient
+Steadfast
+Alpha
+Gamma
+Beta
+Omega
+Theta

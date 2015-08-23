@@ -22,3 +22,6 @@ Healers
 Fixers
 Diamonds
 Rocks
+Stewards
+Builders
+Planners

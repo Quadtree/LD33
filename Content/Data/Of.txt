@@ -12,3 +12,6 @@ the Planets
 the Bridges
 the Towers
 Height
+the Night
+the Day
+Fog
