@@ -154,6 +154,11 @@ void ALD33HUD::DrawHUD()
 			bx.BlendMode = ESimpleElementBlendMode::SE_BLEND_AlphaBlend;
 			Canvas->DrawItem(bx);
 		}
+
+		{
+			FCanvasTextItem txt(FVector2D(350 + i * 70, Canvas->ClipY - 330) + FVector2D(5, 5), FText::FromString(AbilityText[i]), ChatMessageFont, FColor::White);
+			Canvas->DrawItem(txt);
+		}
 	}
 
 	// draw the health bars
