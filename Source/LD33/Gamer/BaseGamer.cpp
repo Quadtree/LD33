@@ -296,6 +296,19 @@ void ABaseGamer::UpdateState()
 		}
 	}
 
+	if (CurrentState == GamerState::GS_Scouting && GetVelocity().SizeSquared() < FMath::Square(200))
+	{
+		if (auto c = Cast<AAIController>(GetController()))
+		{
+			auto t = c->MoveToLocation(Guild->GetPointOutsideOfTown(), 500);
+		}
+	}
+
+	if (CurrentState == GamerState::GS_Farming && !nearestEnemy)
+	{
+		CurrentState = GamerState::GS_Scouting;
+	}
+
 	if (nearestEnemy)
 	{
 		
@@ -313,6 +326,21 @@ void ABaseGamer::UpdateState()
 			}
 
 			GetCharacterMovement()->SetAvoidanceEnabled(true);
+		}
+	}
+
+	for (TActorIterator<AMeteorProjectile> i(GetWorld()); i; ++i)
+	{
+		float distSquared = (i->GetActorLocation() - GetActorLocation()).SizeSquared2D();
+
+		if (distSquared < FMath::Square(500))
+		{
+			UE_LOG(LogLD33, Display, TEXT("GET OUT THE WAY"));
+			if (auto c = Cast<AAIController>(GetController()))
+			{
+				// GET OUT THE WAY
+				auto t = c->MoveToLocation(FMath::RandPointInBox(FBox(FVector(-800,-800,0), FVector(800,800,0))) + GetActorLocation());
+			}
 		}
 	}
 }
@@ -539,7 +567,7 @@ void ABaseGamer::Respawn()
 	GetWorld()->LineTraceSingleByChannel(hit, FVector(0, 0, 50000), FVector(0, 0, 0), ECollisionChannel::ECC_WorldStatic);
 
 	SetActorLocation(FMath::RandPointInBox(FBox(FVector(-500, -500, hit.ImpactPoint.Z), FVector(500, 500, hit.ImpactPoint.Z))));
-	CurrentState = GamerState::GS_IdleInTown;
+	CurrentState = FMath::RandBool() ? GamerState::GS_IdleInTown : GamerState::GS_Scouting;
 
 	GetMesh()->SetSimulatePhysics(false);
 	GetMesh()->SetWorldRotation(GetRootComponent()->GetComponentRotation().Quaternion() + OriginalMeshTransform.GetRotation());
