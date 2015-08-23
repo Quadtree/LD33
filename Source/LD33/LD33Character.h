@@ -65,6 +65,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = Death)
 	void OnSoulDrain(class AActor* target);
 
+	UPROPERTY(BlueprintReadOnly, Category = Kills)
 	int32 Kills;
 };
 
