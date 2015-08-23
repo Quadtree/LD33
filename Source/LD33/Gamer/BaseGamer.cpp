@@ -93,7 +93,7 @@ void ABaseGamer::UpdateMessageQueue()
 
 void ABaseGamer::UpdateState()
 {
-	if (CurrentState == GamerState::GS_PlayerVersusPlayer && GetActorLocation().SizeSquared2D() < FMath::Square(2000)) CurrentState = GamerState::GS_IdleInTown;
+	if (CurrentState == GamerState::GS_PlayerVersusPlayer && GetActorLocation().SizeSquared2D() < FMath::Square(3000)) CurrentState = GamerState::GS_IdleInTown;
 
 	GetCharacterMovement()->SetAvoidanceEnabled(false);
 
@@ -312,11 +312,13 @@ void ABaseGamer::UpdateState()
 	{
 		for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
 		{
-			nearestEnemy = *i;
-
 			if (i->Health <= 0)
 			{
 				CurrentState = GamerState::GS_PlayerVersusPlayer;
+			}
+			else
+			{
+				nearestEnemy = *i;
 			}
 		}
 	}
@@ -462,7 +464,7 @@ void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 			else
 			{
 				// reply WITH VIOLENCE
-				if (GetActorLocation().SizeSquared2D() > FMath::Square(2000))
+				if (GetActorLocation().SizeSquared2D() > FMath::Square(3000))
 					CurrentState = GamerState::GS_PlayerVersusPlayer;
 			}
 		}
@@ -578,7 +580,7 @@ float ABaseGamer::TakeDamage(float Damage, struct FDamageEvent const& DamageEven
 				CurrentState = GamerState::GS_PlayerVersusPlayer;
 			}
 
-			if (EventInstigator && Cast<APlayerController>(EventInstigator) && IsLeader && FMath::RandRange(1, 4) == 1)
+			if (EventInstigator && Cast<APlayerController>(EventInstigator) && IsLeader && FMath::RandRange(1, 2) == 1)
 			{
 				// taking too much damage, just attack
 				SendGamerMessage(GamerMessageType::GMT_AttackBossNow);
