@@ -232,7 +232,7 @@ void ABaseGamer::UpdateState()
 
 void ABaseGamer::SendGamerMessage(GamerMessageType type)
 {
-	UE_LOG(LogLD33, Display, TEXT("%s (%s) send %s"), *GetName(), *FString::FromInt(IsLeader), *FString::FromInt((int32)type));
+	//UE_LOG(LogLD33, Display, TEXT("%s (%s) send %s"), *GetName(), *FString::FromInt(IsLeader), *FString::FromInt((int32)type));
 
 	FGamerMessage msg;
 	msg.Type = type;
@@ -261,11 +261,11 @@ void ABaseGamer::SendGamerMessage(GamerMessageType type)
 
 void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 {
-	UE_LOG(LogLD33, Display, TEXT("%s (%s) rec %s"), *GetName(), *FString::FromInt(IsLeader), *FString::FromInt((int32)msg.Type));
+	//UE_LOG(LogLD33, Display, TEXT("%s (%s) rec %s"), *GetName(), *FString::FromInt(IsLeader), *FString::FromInt((int32)msg.Type));
 
 	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && msg.Type == GamerMessageType::GMT_RequestMemberJoin && msg.Sender->Guild == this->Guild && msg.Sender->IsLeader && !IsLeader)
 	{
-		UE_LOG(LogLD33, Display, TEXT("%s is now following leader"), *GetName());
+		//UE_LOG(LogLD33, Display, TEXT("%s is now following leader"), *GetName());
 		CurrentState = GamerState::GS_FollowingLeader;
 
 		if (FMath::RandRange(1, 3) == 1) SendGamerMessage(GamerMessageType::GMT_Ack);
@@ -273,7 +273,7 @@ void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 
 	if (CurrentState != GamerState::GS_AttackingBoss && CurrentState != GamerState::GS_ApproachingBoss && CurrentState != GamerState::GS_PlayerVersusPlayer && msg.Type == GamerMessageType::GMT_ReportBossUp && msg.Sender->Guild == this->Guild && IsLeader)
 	{
-		UE_LOG(LogLD33, Display, TEXT("%s is now looking for more"), *GetName());
+		//UE_LOG(LogLD33, Display, TEXT("%s is now looking for more"), *GetName());
 		CurrentState = GamerState::GS_LookingForMore;
 
 		if (FMath::RandRange(1, 2) == 1) SendGamerMessage(GamerMessageType::GMT_Ack);
@@ -281,7 +281,7 @@ void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 
 	if (msg.Type == GamerMessageType::GMT_AttackBossNow && CurrentState != GamerState::GS_PlayerVersusPlayer && CurrentState != GamerState::GS_AttackingBoss && msg.Sender->Guild == Guild && msg.Sender->IsLeader)
 	{
-		UE_LOG(LogLD33, Display, TEXT("%s is attacking boss"), *GetName());
+		//UE_LOG(LogLD33, Display, TEXT("%s is attacking boss"), *GetName());
 		CurrentState = GamerState::GS_AttackingBoss;
 
 		if (FMath::RandRange(1, 3) == 1) SendGamerMessage(GamerMessageType::GMT_Ack);
