@@ -21,11 +21,11 @@ void ALD33HUD::DrawHUD()
 	//FFontRenderInfo inf;
 	//inf.bEnabledShadow = true;
 
-	FVector2D minimapSize = FVector2D(300, 300);
-	FVector2D healthBarsPos = FVector2D(350, Canvas->ClipY - 110);
-	FVector2D minimapPos = FVector2D(30, Canvas->ClipY - 30 - minimapSize.Y);
-	FVector2D worldHalfSize = FVector2D(WORLD_SIZE, WORLD_SIZE);
-	FVector2D overheadHealthBarSize = FVector2D(50, 4);
+	const FVector2D minimapSize = FVector2D(300, 300);
+	const FVector2D healthBarsPos = FVector2D(350, Canvas->ClipY - 110);
+	const FVector2D minimapPos = FVector2D(30, Canvas->ClipY - 30 - minimapSize.Y);
+	const FVector2D worldHalfSize = FVector2D(WORLD_SIZE, WORLD_SIZE);
+	const FVector2D overheadHealthBarSize = FVector2D(50, 4);
 
 	const float HEALTH_BAR_BORDER_SIZE = 2;
 
@@ -127,7 +127,7 @@ void ALD33HUD::DrawHUD()
 	
 	for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
 	{
-		FCanvasTileItem mic(minimapPos + FVector2D((i->GetActorLocation().Y + worldHalfSize.Y) / (worldHalfSize.Y * 2) * minimapSize.X, minimapSize.Y - (i->GetActorLocation().X + worldHalfSize.X) / (worldHalfSize.X * 2) * minimapSize.Y) - FVector2D(4, 4), FVector2D(8, 8), FColor::White);
+		FCanvasTileItem mic(minimapPos + FVector2D((i->GetActorLocation().Y + worldHalfSize.Y) / (worldHalfSize.Y * 2) * minimapSize.X, minimapSize.Y - (i->GetActorLocation().X + worldHalfSize.X) / (worldHalfSize.X * 2) * minimapSize.Y) - FVector2D(4, 4), FVector2D(8, 8), FColor::Green);
 		Canvas->DrawItem(mic);
 		ch = *i;
 	}
