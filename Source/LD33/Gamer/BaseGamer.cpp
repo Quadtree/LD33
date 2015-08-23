@@ -83,6 +83,8 @@ void ABaseGamer::UpdateState()
 {
 	GetCharacterMovement()->SetAvoidanceEnabled(false);
 
+	if (Health <= 0) return;
+
 	IsCurrentlyAttacking = false;
 
 	TArray<FOverlapResult> res;
@@ -341,6 +343,7 @@ void ABaseGamer::Attack(AActor* target)
 		else
 		{
 			target->TakeDamage(MeleeAttack * 2400, FDamageEvent(), c, this);
+			OnMeleeAttack(target);
 			IsCurrentlyAttacking = true;
 		}
 	}

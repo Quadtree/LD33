@@ -117,4 +117,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Spell)
 	void OnCastHeal(AActor* target);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Spell)
+	void OnMeleeAttack(AActor* target);
 };

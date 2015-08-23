@@ -105,6 +105,13 @@ void ALD33HUD::DrawHUD()
 		}
 	}
 
+	{
+		FCanvasTileItem bx(FVector2D(0, Canvas->ClipY - 360), FVector2D(580, 360), FColor::White);
+		bx.Texture = MainUITexture->Resource;
+		bx.BlendMode = ESimpleElementBlendMode::SE_BLEND_AlphaBlend;
+		Canvas->DrawItem(bx);
+	}
+
 	// draw the minimap
 	FCanvasTileItem bx(minimapPos, minimapSize, FColor::Black);
 	Canvas->DrawItem(bx);

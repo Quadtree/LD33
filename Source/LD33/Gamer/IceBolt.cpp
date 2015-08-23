@@ -29,6 +29,7 @@ void AIceBolt::Tick( float DeltaTime )
 
 	if (FVector::DistSquared(Target->GetActorLocation(), GetActorLocation()) < FMath::Square(moveDist))
 	{
+		OnIceBoltHit();
 		Target->TakeDamage(DamageOnHit, FDamageEvent(), GetInstigator() ? GetInstigator()->GetController() : nullptr, this);
 		Destroy();
 	}

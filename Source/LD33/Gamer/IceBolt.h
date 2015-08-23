@@ -25,4 +25,7 @@ public:
 	float DamageOnHit;
 	
 	void Align();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Hit)
+	void OnIceBoltHit();
 };

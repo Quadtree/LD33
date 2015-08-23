@@ -20,6 +20,9 @@ class LD33_API ALD33HUD : public AHUD
 
 	UPROPERTY(EditAnywhere, Category = Font)
 	class UFont* ChatMessageFont;
+
+	UPROPERTY(EditAnywhere, Category = Font)
+	UTexture2D* MainUITexture;
 public:
 	void AddChatMessage(FVector pos, FString text);
 
