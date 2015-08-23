@@ -55,5 +55,7 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Death)
 	void OnDeath();
+
+	bool UseMana(float qty);
 };
 

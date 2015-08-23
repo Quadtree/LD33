@@ -354,4 +354,5 @@ void ABaseGamer::Respawn()
 	Health = MaxHealth;
 
 	SetActorLocation(FMath::RandPointInBox(FBox(FVector(-500, -500, -1000), FVector(500, 500, -1000))));
+	CurrentState = GamerState::GS_IdleInTown;
 }

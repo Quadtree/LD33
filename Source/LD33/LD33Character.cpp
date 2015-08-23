@@ -53,6 +53,19 @@ void ALD33Character::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	AbilityCooldown -= DeltaSeconds;
+
+	TArray<FOverlapResult> res;
+
+	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_WorldDynamic, FCollisionShape::MakeSphere(4000)))
+	{
+		for (auto a : res)
+		{
+			if (auto g = Cast<ABaseGamer>(a.Actor.Get()))
+			{
+				Mana = FMath::Min(Mana + DeltaSeconds * 150, MaxMana);
+			}
+		}
+	}
 }
 
 float ALD33Character::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -71,9 +84,22 @@ float ALD33Character::TakeDamage(float Damage, struct FDamageEvent const& Damage
 	return Damage;
 }
 
+bool ALD33Character::UseMana(float qty)
+{
+	if (Mana >= qty)
+	{
+		Mana -= qty;
+		return true;
+	}
+
+	return false;
+}
+
 void ALD33Character::FrontalConeAttack(FVector targetPt)
 {
 	if (AbilityCooldown > 0 || Health <= 0) return;
+
+	if (!UseMana(6000)) return;
 
 	UE_LOG(LogTemp, Display, TEXT("Frontal cone attack at %s"), *targetPt.ToString());
 
@@ -116,6 +142,8 @@ void ALD33Character::SoulDrainAttack(AActor* target)
 {
 	if (AbilityCooldown > 0 || Health <= 0) return;
 
+	if (!UseMana(4000)) return;
+
 	if (target)
 	{
 		UE_LOG(LogTemp, Display, TEXT("SoulDrainAttack at %s"), *target->GetName());
@@ -139,6 +167,8 @@ void ALD33Character::SoulDrainAttack(AActor* target)
 void ALD33Character::MeteorAttack(FVector targetPt)
 {
 	if (AbilityCooldown > 0 || Health <= 0) return;
+
+	if (!UseMana(15000)) return;
 
 	UE_LOG(LogTemp, Display, TEXT("MeteorAttack at %s"), *targetPt.ToString());
 
