@@ -114,4 +114,7 @@ public:
 	float RespawnTimer;
 
 	FTransform OriginalMeshTransform;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Spell)
+	void OnCastHeal(AActor* target);
 };

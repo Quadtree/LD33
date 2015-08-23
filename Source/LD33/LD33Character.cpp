@@ -72,15 +72,18 @@ void ALD33Character::Tick(float DeltaSeconds)
 
 float ALD33Character::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	Health -= Damage;
-
-	if (Health <= 0)
+	if (Health > 0)
 	{
-		GetMovementComponent()->SetActive(false);
+		Health -= Damage;
 
-		GetMesh()->SetVisibility(false);
+		if (Health <= 0)
+		{
+			GetMovementComponent()->SetActive(false);
 
-		OnDeath();
+			GetMesh()->SetVisibility(false);
+
+			OnDeath();
+		}
 	}
 
 	return Damage;
@@ -104,8 +107,6 @@ void ALD33Character::FrontalConeAttack(FVector targetPt)
 	if (!UseMana(6000)) return;
 
 	UE_LOG(LogTemp, Display, TEXT("Frontal cone attack at %s"), *targetPt.ToString());
-
-	OnConeAttack();
 
 	FVector deltaToPt = targetPt - GetActorLocation();
 	deltaToPt.Z = 0;
@@ -140,6 +141,8 @@ void ALD33Character::FrontalConeAttack(FVector targetPt)
 	}
 
 	AbilityCooldown = 1;
+
+	OnConeAttack();
 }
 
 void ALD33Character::SoulDrainAttack(AActor* target)

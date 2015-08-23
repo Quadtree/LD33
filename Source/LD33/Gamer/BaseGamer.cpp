@@ -81,11 +81,16 @@ void ABaseGamer::UpdateMessageQueue()
 
 void ABaseGamer::UpdateState()
 {
+	GetCharacterMovement()->SetAvoidanceEnabled(false);
+
 	IsCurrentlyAttacking = false;
 
 	TArray<FOverlapResult> res;
 
 	int32 numGuildMembersNearby = 0;
+
+	float mostDamagedAllyHealth = FLT_MAX;
+	AActor* mostDamagedAlly = nullptr;
 
 	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_WorldDynamic, FCollisionShape::MakeSphere(4000)))
 	{
@@ -129,9 +134,24 @@ void ABaseGamer::UpdateState()
 					{
 						SendGamerMessage(GamerMessageType::GMT_AttackBossNow);
 					}
+
+					if (HealPower >= 0.1f)
+					{
+						if (t->Health < (t->MaxHealth - 100) && t->Health > 0 && t->Health < mostDamagedAllyHealth)
+						{
+							mostDamagedAllyHealth = t->Health;
+							mostDamagedAlly = t;
+						}
+					}
 				}
 			}
 		}
+	}
+
+	if (mostDamagedAlly)
+	{
+		mostDamagedAlly->TakeDamage(-3000, FDamageEvent(), GetController(), this);
+		OnCastHeal(mostDamagedAlly);
 	}
 
 	if (CurrentState == GamerState::GS_ReportingBossSighting && IsLeader)
@@ -221,7 +241,22 @@ void ABaseGamer::UpdateState()
 	{
 		for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
 		{
-			if (MeleeAttack > HealPower || MagicAttack > HealPower) Attack(*i);
+			if (MeleeAttack > HealPower || MagicAttack > HealPower)
+			{
+				Attack(*i);
+			}
+			else
+			{
+				// if we get here it means i am a healer
+				if (auto c = Cast<AAIController>(GetController()))
+				{
+					// try to stay within 30m
+					auto t = c->MoveToLocation(i->GetActorLocation(), 3000);
+				}
+
+				GetCharacterMovement()->SetAvoidanceEnabled(true);
+			}
+			
 
 			if (i->Health <= 0)
 			{
@@ -311,6 +346,8 @@ void ABaseGamer::Attack(AActor* target)
 	}
 	else 
 	{
+		GetCharacterMovement()->SetAvoidanceEnabled(true);
+
 		if (rangeToTargetSquared > FMath::Square(2500))
 		{
 			c->MoveToActor(target, 2400);
