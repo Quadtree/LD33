@@ -52,6 +52,8 @@ void ALD33Character::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	if (Health <= 0) return;
+
 	AbilityCooldown -= DeltaSeconds;
 
 	TArray<FOverlapResult> res;
@@ -156,7 +158,7 @@ void ALD33Character::SoulDrainAttack(AActor* target)
 
 		if (actualDamage >= initialHp)
 		{
-			Health = FMath::Clamp(Health + 40000, 0.f, MaxHealth);
+			Health = FMath::Clamp(Health + 15000, 0.f, MaxHealth);
 			UE_LOG(LogTemp, Display, TEXT("Successful soul drain"));
 		}
 

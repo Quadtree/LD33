@@ -366,6 +366,10 @@ void ABaseGamer::Respawn()
 {
 	Health = MaxHealth;
 
-	SetActorLocation(FMath::RandPointInBox(FBox(FVector(-500, -500, -1000), FVector(500, 500, -1000))));
+	FHitResult hit;
+
+	GetWorld()->LineTraceSingleByChannel(hit, FVector(0, 0, 50000), FVector(0, 0, 0), ECollisionChannel::ECC_WorldStatic);
+
+	SetActorLocation(FMath::RandPointInBox(FBox(FVector(-500, -500, hit.ImpactPoint.Z), FVector(500, 500, hit.ImpactPoint.Z))));
 	CurrentState = GamerState::GS_IdleInTown;
 }
