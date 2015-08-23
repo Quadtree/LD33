@@ -108,4 +108,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = Attack)
 	bool IsCurrentlyAttacking;
+
+	void GamerInit();
 };

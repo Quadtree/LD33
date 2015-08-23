@@ -24,6 +24,11 @@ void ABaseGamer::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	
+}
+
+void ABaseGamer::GamerInit()
+{
 	MaxHealth = BaseMaxHealth;
 	Health = MaxHealth;
 	Armor = BaseArmor;
@@ -34,7 +39,7 @@ void ABaseGamer::BeginPlay()
 	TArray<FString> syl;
 
 	FFileHelper::LoadANSITextFileToStrings(*(FPaths::GameContentDir() + "Data/NameSyllables.txt"), nullptr, syl);
-	
+
 	if (syl.Num())
 	{
 		while (true)
@@ -48,7 +53,7 @@ void ABaseGamer::BeginPlay()
 
 			if (newName.Len() > 9 || newName.Len() < 4) continue;
 
-			bool isMaleName = !newName.EndsWith("A") && newName.EndsWith("E");
+			bool isMaleName = !newName.EndsWith("A") && !newName.EndsWith("E");
 
 			if (isMaleName != IsMale) continue;
 

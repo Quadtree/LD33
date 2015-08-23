@@ -104,6 +104,8 @@ void AGuild::BeginPlay()
 				{
 					g->CurrentState = GamerState::GS_Scouting;
 				}
+
+				g->GamerInit();
 			}
 		}
 		else
