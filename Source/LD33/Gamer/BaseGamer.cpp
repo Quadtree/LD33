@@ -9,6 +9,7 @@
 #include "Guild.h"
 #include "AIController.h"
 #include "IceBolt.h"
+#include "MeteorProjectile.h"
 
 
 // Sets default values
@@ -94,6 +95,8 @@ void ABaseGamer::UpdateState()
 	float mostDamagedAllyHealth = FLT_MAX;
 	AActor* mostDamagedAlly = nullptr;
 
+	AGuild* detectedKSer = nullptr;
+
 	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_WorldDynamic, FCollisionShape::MakeSphere(4000)))
 	{
 		for (auto a : res)
@@ -146,8 +149,22 @@ void ABaseGamer::UpdateState()
 						}
 					}
 				}
+				else
+				{
+					if (t->CurrentState == GamerState::GS_AttackingBoss && CurrentState == GamerState::GS_AttackingBoss)
+					{
+						detectedKSer = t->Guild;
+						// hey they're KSing us!
+						
+					}
+				}
 			}
 		}
+	}
+
+	if (detectedKSer && FMath::RandRange(1, 20))
+	{
+		SendGamerMessage(GamerMessageType::GMT_Insult, detectedKSer);
 	}
 
 	if (mostDamagedAlly)
@@ -268,13 +285,14 @@ void ABaseGamer::UpdateState()
 	}
 }
 
-void ABaseGamer::SendGamerMessage(GamerMessageType type)
+void ABaseGamer::SendGamerMessage(GamerMessageType type, class AGuild* targetGuild)
 {
 	//UE_LOG(LogLD33, Display, TEXT("%s (%s) send %s"), *GetName(), *FString::FromInt(IsLeader), *FString::FromInt((int32)type));
 
 	FGamerMessage msg;
 	msg.Type = type;
 	msg.Sender = this;
+	msg.TargetGuild = targetGuild;
 
 	TArray<FOverlapResult> res;
 	if (GetWorld()->OverlapMultiByChannel(res, GetActorLocation(), FQuat::Identity, ECollisionChannel::ECC_WorldDynamic, FCollisionShape::MakeSphere(4000)))
@@ -295,6 +313,17 @@ void ABaseGamer::SendGamerMessage(GamerMessageType type)
 	{
 		i->AddChatMessage(GetActorLocation(), msg.ToString());
 	}
+}
+
+void ABaseGamer::SendInsult()
+{
+	if (LastInsultedMe)
+		SendGamerMessage(GamerMessageType::GMT_Insult, LastInsultedMe);
+}
+
+void ABaseGamer::SendPunish()
+{
+	SendGamerMessage(GamerMessageType::GMT_Punish);
 }
 
 void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
@@ -323,6 +352,31 @@ void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 		CurrentState = GamerState::GS_AttackingBoss;
 
 		if (FMath::RandRange(1, 3) == 1) SendGamerMessage(GamerMessageType::GMT_Ack);
+	}
+
+	if (msg.Type == GamerMessageType::GMT_Excuse && msg.Sender->Guild == Guild && IsLeader)
+	{
+		FTimerHandle h;
+		GetWorld()->GetTimerManager().SetTimer(h, this, &ABaseGamer::SendPunish, FMath::FRandRange(0.35f, 1.2f));
+	}
+
+	if (msg.Type == GamerMessageType::GMT_Insult && Guild == msg.TargetGuild)
+	{
+		if (FMath::RandRange(1, 8) == 1)
+		{
+			// we are going to reply
+			if (FMath::RandRange(1, 5) == 1 || FVector::DistSquared(GetActorLocation(), FVector(0,0,0)) < FMath::Square(1200))
+			{
+				FTimerHandle h;
+				LastInsultedMe = msg.Sender->Guild;
+				GetWorld()->GetTimerManager().SetTimer(h, this, &ABaseGamer::SendInsult, FMath::FRandRange(0.35f, 1.2f));
+			}
+			else
+			{
+				// reply WITH VIOLENCE
+				CurrentState = GamerState::GS_PlayerVersusPlayer;
+			}
+		}
 	}
 }
 
@@ -415,6 +469,11 @@ float ABaseGamer::TakeDamage(float Damage, struct FDamageEvent const& DamageEven
 				{
 					i->Kills++;
 				}
+			}
+
+			if (Cast<AMeteorProjectile>(DamageCauser) && FMath::RandBool())
+			{
+				SendGamerMessage(GamerMessageType::GMT_Excuse);
 			}
 		}
 	}

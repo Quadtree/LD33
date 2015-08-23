@@ -8,6 +8,9 @@ enum class GamerMessageType : uint8
 	GMT_RequestMemberJoin,
 	GMT_AttackBossNow,
 	GMT_Ack,
+	GMT_Excuse,
+	GMT_Punish,
+	GMT_Insult,
 	GMT_Max
 };
 
@@ -19,6 +22,8 @@ public:
 	class ABaseGamer* Sender;
 
 	GamerMessageType Type;
+
+	class AGuild* TargetGuild;
 
 protected:
 	FString RT(const char* a, const char* b)

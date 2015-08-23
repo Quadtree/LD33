@@ -101,7 +101,7 @@ public:
 
 	GamerState CurrentState;
 
-	void SendGamerMessage(GamerMessageType type);
+	void SendGamerMessage(GamerMessageType type, class AGuild* targetGuild = nullptr);
 	void ReceiveGamerMessage(const FGamerMessage& msg);
 
 	void Attack(AActor* target);
@@ -120,4 +120,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = Spell)
 	void OnMeleeAttack(AActor* target);
+
+	class AGuild* LastInsultedMe;
+
+	void SendInsult();
+	void SendPunish();
 };
