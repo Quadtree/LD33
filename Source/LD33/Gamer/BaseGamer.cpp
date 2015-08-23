@@ -194,9 +194,14 @@ void ABaseGamer::UpdateState()
 		SendGamerMessage(GamerMessageType::GMT_Insult, detectedKSer);
 	}
 
+	if (Health < (MaxHealth - 100) && HealPower >= 0.5f)
+	{
+		mostDamagedAlly = this;
+	}
+
 	if (mostDamagedAlly)
 	{
-		mostDamagedAlly->TakeDamage(-3000, FDamageEvent(), GetController(), this);
+		mostDamagedAlly->TakeDamage(-2000, FDamageEvent(), GetController(), this);
 		OnCastHeal(mostDamagedAlly);
 	}
 
@@ -450,7 +455,7 @@ void ABaseGamer::Attack(AActor* target)
 
 	if (MeleeAttack > MagicAttack)
 	{
-		if (rangeToTargetSquared > FMath::Square(200))
+		if (rangeToTargetSquared > FMath::Square(400))
 		{
 			c->MoveToActor(target, 150);
 		}
@@ -567,7 +572,7 @@ void ABaseGamer::Respawn()
 	GetWorld()->LineTraceSingleByChannel(hit, FVector(0, 0, 50000), FVector(0, 0, 0), ECollisionChannel::ECC_WorldStatic);
 
 	SetActorLocation(FMath::RandPointInBox(FBox(FVector(-500, -500, hit.ImpactPoint.Z), FVector(500, 500, hit.ImpactPoint.Z))));
-	CurrentState = FMath::RandBool() ? GamerState::GS_IdleInTown : GamerState::GS_Scouting;
+	CurrentState = GamerState::GS_Scouting;
 
 	GetMesh()->SetSimulatePhysics(false);
 	GetMesh()->SetWorldRotation(GetRootComponent()->GetComponentRotation().Quaternion() + OriginalMeshTransform.GetRotation());

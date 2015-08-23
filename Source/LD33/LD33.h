@@ -8,7 +8,7 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(LogLD33, Log, All);
 
-#define WORLD_SIZE		14000
+#define WORLD_SIZE		16500
 
 
 #endif
