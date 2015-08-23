@@ -110,4 +110,8 @@ public:
 	bool IsCurrentlyAttacking;
 
 	void GamerInit();
+
+	float RespawnTimer;
+
+	FTransform OriginalMeshTransform;
 };

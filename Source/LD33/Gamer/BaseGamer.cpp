@@ -24,7 +24,8 @@ void ABaseGamer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
+	RespawnTimer = 0;
+	OriginalMeshTransform = GetMesh()->GetRelativeTransform();
 }
 
 void ABaseGamer::GamerInit()
@@ -173,7 +174,7 @@ void ABaseGamer::UpdateState()
 
 	if (CurrentState == GamerState::GS_LookingForMore)
 	{
-		UE_LOG(LogLD33, Display, TEXT("%s LFM"), *GetName());
+		//UE_LOG(LogLD33, Display, TEXT("%s LFM"), *GetName());
 
 		float nearestDist = FLT_MAX;
 		ABaseGamer* nearest = nullptr;
@@ -337,6 +338,15 @@ void ABaseGamer::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+	if (Health <= 0)
+	{
+		RespawnTimer -= DeltaTime;
+
+		if (RespawnTimer <= 0)
+		{
+			Respawn();
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -355,7 +365,9 @@ float ABaseGamer::TakeDamage(float Damage, struct FDamageEvent const& DamageEven
 
 		if (Health <= 0)
 		{
-			Respawn();
+			RespawnTimer = 10;
+			GetMovementComponent()->SetActive(false);
+			GetMesh()->SetSimulatePhysics(true);
 		}
 	}
 	else
@@ -369,6 +381,8 @@ float ABaseGamer::TakeDamage(float Damage, struct FDamageEvent const& DamageEven
 
 void ABaseGamer::Respawn()
 {
+	GetMovementComponent()->SetActive(true);
+
 	Health = MaxHealth;
 
 	FHitResult hit;
@@ -377,4 +391,8 @@ void ABaseGamer::Respawn()
 
 	SetActorLocation(FMath::RandPointInBox(FBox(FVector(-500, -500, hit.ImpactPoint.Z), FVector(500, 500, hit.ImpactPoint.Z))));
 	CurrentState = GamerState::GS_IdleInTown;
+
+	GetMesh()->SetSimulatePhysics(false);
+	GetMesh()->SetWorldRotation(GetRootComponent()->GetComponentRotation().Quaternion() + OriginalMeshTransform.GetRotation());
+	GetMesh()->SetWorldLocation(GetRootComponent()->GetComponentLocation() + OriginalMeshTransform.GetLocation());
 }
