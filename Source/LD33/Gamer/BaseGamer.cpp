@@ -319,7 +319,7 @@ void ABaseGamer::UpdateState()
 		}
 	}
 
-	if (CurrentState == GamerState::GS_Farming && !nearestEnemy)
+	if ((CurrentState == GamerState::GS_Farming || CurrentState == GamerState::GS_PlayerVersusPlayer) && !nearestEnemy)
 	{
 		CurrentState = GamerState::GS_Scouting;
 	}
@@ -465,7 +465,7 @@ void ABaseGamer::Attack(AActor* target)
 
 	if (MeleeAttack > MagicAttack)
 	{
-		if (rangeToTargetSquared > FMath::Square(400))
+		if (rangeToTargetSquared > FMath::Square(600))
 		{
 			c->MoveToActor(target, 150);
 		}
@@ -610,6 +610,8 @@ void ABaseGamer::Respawn()
 		rp->GamerInit();
 
 		check(rp->Health > 0);
+
+		rp->CurrentState = GamerState::GS_Scouting;
 
 		break;
 	}

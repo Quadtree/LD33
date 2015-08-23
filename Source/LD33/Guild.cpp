@@ -125,7 +125,7 @@ void AGuild::Tick( float DeltaTime )
 bool AGuild::GetTerrainHeightAt(FVector2D pt, FVector& outHeight)
 {
 	FHitResult hit;
-	if (GetWorld()->LineTraceSingleByChannel(hit, FVector(pt.X, pt.Y, 5000), FVector(pt.X, pt.Y, -5000), ECollisionChannel::ECC_Visibility))
+	if (GetWorld()->LineTraceSingleByChannel(hit, FVector(pt.X, pt.Y, 50000), FVector(pt.X, pt.Y, -5000), ECollisionChannel::ECC_Visibility))
 	{
 		if (hit.Actor.IsValid() && Cast<ALandscape>(hit.Actor.Get()))
 		{
