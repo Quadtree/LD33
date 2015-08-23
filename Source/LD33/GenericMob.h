@@ -26,6 +26,22 @@ public:
 	UPROPERTY(EditAnywhere, Category = Health)
 	float MaxHealth;
 
+	UPROPERTY(EditAnywhere, Category = Health)
+	float MeleeAttack;
+
 	float Health;
 	
+	void ScanArea();
+
+	FVector InitialAggroPoint;
+
+	AActor* AggroedOn;
+
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Death)
+	void OnDeath();
+
+	UPROPERTY(BlueprintReadOnly, Category = Attack)
+	bool IsCurrentlyAttacking;
 };

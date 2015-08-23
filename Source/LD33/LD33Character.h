@@ -46,6 +46,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
 	float MaxMana;
 
+	UPROPERTY(BlueprintReadOnly, Category = Ability)
 	float AbilityCooldown;
 
 	UPROPERTY(EditAnywhere, Category = Spawn)

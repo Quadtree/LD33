@@ -105,4 +105,7 @@ public:
 	void ReceiveGamerMessage(const FGamerMessage& msg);
 
 	void Attack(AActor* target);
+
+	UPROPERTY(BlueprintReadOnly, Category = Attack)
+	bool IsCurrentlyAttacking;
 };

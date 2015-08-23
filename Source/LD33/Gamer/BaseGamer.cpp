@@ -75,6 +75,8 @@ void ABaseGamer::UpdateMessageQueue()
 
 void ABaseGamer::UpdateState()
 {
+	IsCurrentlyAttacking = false;
+
 	TArray<FOverlapResult> res;
 
 	int32 numGuildMembersNearby = 0;
@@ -298,6 +300,7 @@ void ABaseGamer::Attack(AActor* target)
 		else
 		{
 			target->TakeDamage(MeleeAttack * 2400, FDamageEvent(), c, this);
+			IsCurrentlyAttacking = true;
 		}
 	}
 	else 
@@ -318,6 +321,8 @@ void ABaseGamer::Attack(AActor* target)
 				ib->Align();
 				ib->DamageOnHit = MagicAttack * 2800;
 			}
+
+			IsCurrentlyAttacking = true;
 		}
 	}
 }
