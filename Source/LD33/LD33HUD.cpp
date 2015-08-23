@@ -105,6 +105,7 @@ void ALD33HUD::DrawHUD()
 		}
 	}
 
+	// draw the background of the ui
 	{
 		FCanvasTileItem bx(FVector2D(0, Canvas->ClipY - 360), FVector2D(580, 360), FColor::White);
 		bx.Texture = MainUITexture->Resource;
@@ -131,12 +132,28 @@ void ALD33HUD::DrawHUD()
 	}
 
 	ALD33Character* ch = nullptr;
-	
+
 	for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
 	{
 		FCanvasTileItem mic(minimapPos + FVector2D((i->GetActorLocation().Y + worldHalfSize.Y) / (worldHalfSize.Y * 2) * minimapSize.X, minimapSize.Y - (i->GetActorLocation().X + worldHalfSize.X) / (worldHalfSize.X * 2) * minimapSize.Y) - FVector2D(4, 4), FVector2D(8, 8), FColor::Green);
 		Canvas->DrawItem(mic);
 		ch = *i;
+	}
+
+	// draw the abilities
+	for (int32 i = 0; i < AbilityTextures.Num(); ++i)
+	{
+		{
+			FCanvasTileItem bx(FVector2D(350 + i * 70, Canvas->ClipY - 330), FVector2D(60, 60), FColor::White);
+			bx.Texture = AbilityTextures[i]->Resource;
+			Canvas->DrawItem(bx);
+		}
+
+		{
+			FCanvasTileItem bx(FVector2D(350 + i * 70, Canvas->ClipY - 330 + (60 - (FMath::Clamp(ch->AbilityCooldown, 0.f, 1.f) * 60))), FVector2D(60, FMath::Clamp(ch->AbilityCooldown, 0.f, 1.f) * 60), FColor(0, 0, 0, 128));
+			bx.BlendMode = ESimpleElementBlendMode::SE_BLEND_AlphaBlend;
+			Canvas->DrawItem(bx);
+		}
 	}
 
 	// draw the health bars
