@@ -21,21 +21,15 @@ void ALD33HUD::DrawHUD()
 	//inf.bEnabledShadow = true;
 
 	FVector2D minimapSize = FVector2D(300, 300);
+	FVector2D healthBarsPos = FVector2D(350, Canvas->ClipY - 110);
 	FVector2D minimapPos = FVector2D(30, Canvas->ClipY - 30 - minimapSize.Y);
 	FVector2D worldHalfSize = FVector2D(WORLD_SIZE, WORLD_SIZE);
 
-	FCanvasTileItem bx(minimapPos, minimapSize, FColor::Black);
+	const float HEALTH_BAR_BORDER_SIZE = 2;
 
-	Canvas->DrawItem(bx);
-
+	// draw nametags
 	for (TActorIterator<ABaseGamer> i(GetWorld()); i; ++i)
 	{
-		{
-			FCanvasTileItem mic(minimapPos + FVector2D((i->GetActorLocation().Y + worldHalfSize.Y) / (worldHalfSize.Y * 2) * minimapSize.X, minimapSize.Y - (i->GetActorLocation().X + worldHalfSize.X) / (worldHalfSize.X * 2) * minimapSize.Y) - FVector2D(1, 1), FVector2D(3, 3), FColor::Red);
-
-			Canvas->DrawItem(mic);
-		}
-
 		FVector pos = Project(i->GetActorLocation());
 
 		if (pos.X >= -200 && pos.Y >= -200 && pos.X <= Canvas->ClipX + 200 && pos.Y <= Canvas->ClipY + 200)
@@ -57,15 +51,8 @@ void ALD33HUD::DrawHUD()
 
 		//
 	}
-	
-	for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
-	{
-		{
-			FCanvasTileItem mic(minimapPos + FVector2D((i->GetActorLocation().Y + worldHalfSize.Y) / (worldHalfSize.Y * 2) * minimapSize.X, minimapSize.Y - (i->GetActorLocation().X + worldHalfSize.X) / (worldHalfSize.X * 2) * minimapSize.Y) - FVector2D(4, 4), FVector2D(8, 8), FColor::Green);
-			Canvas->DrawItem(mic);
-		}
-	}
 
+	// draw chat messages
 	for (int i = 0; i < ChatMessagePos.Num(); ++i)
 	{
 		if (GetWorld()->GetTimeSeconds() <= ChatMessageTimeLeft[i])
@@ -76,8 +63,7 @@ void ALD33HUD::DrawHUD()
 			{
 				FCanvasTextItem txt(FVector2D(pos.X, pos.Y - 40), FText::FromString(ChatMessageText[i]), ChatMessageFont, FColor::White);
 				txt.bCentreX = true;
-				txt.ShadowColor = FColor::Black;
-				txt.ShadowOffset = FVector2D(1, -1);
+				txt.EnableShadow(FColor::Black, FVector2D(1, 1));
 				Canvas->DrawItem(txt);
 			}
 		}
@@ -87,6 +73,66 @@ void ALD33HUD::DrawHUD()
 			ChatMessageText.RemoveAt(i);
 			ChatMessageTimeLeft.RemoveAt(i);
 			--i;
+		}
+	}
+
+	// draw the minimap
+	FCanvasTileItem bx(minimapPos, minimapSize, FColor::Black);
+	Canvas->DrawItem(bx);
+
+	for (TActorIterator<ABaseGamer> i(GetWorld()); i; ++i)
+	{
+		FCanvasTileItem mic(minimapPos + FVector2D((i->GetActorLocation().Y + worldHalfSize.Y) / (worldHalfSize.Y * 2) * minimapSize.X, minimapSize.Y - (i->GetActorLocation().X + worldHalfSize.X) / (worldHalfSize.X * 2) * minimapSize.Y) - FVector2D(1, 1), FVector2D(3, 3), FColor::Red);
+
+		Canvas->DrawItem(mic);
+	}
+
+	ALD33Character* ch = nullptr;
+	
+	for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
+	{
+		FCanvasTileItem mic(minimapPos + FVector2D((i->GetActorLocation().Y + worldHalfSize.Y) / (worldHalfSize.Y * 2) * minimapSize.X, minimapSize.Y - (i->GetActorLocation().X + worldHalfSize.X) / (worldHalfSize.X * 2) * minimapSize.Y) - FVector2D(4, 4), FVector2D(8, 8), FColor::Green);
+		Canvas->DrawItem(mic);
+		ch = *i;
+	}
+
+	// draw the health bars
+	if (ch)
+	{
+		{
+			FCanvasTileItem bx(healthBarsPos, FVector2D(200, 35), FColor::Black);
+			Canvas->DrawItem(bx);
+		}
+
+		{
+			FCanvasTileItem bx(healthBarsPos + FVector2D(HEALTH_BAR_BORDER_SIZE, HEALTH_BAR_BORDER_SIZE), (FVector2D(200, 35) - FVector2D(HEALTH_BAR_BORDER_SIZE * 2, HEALTH_BAR_BORDER_SIZE * 2)) * FVector2D(FMath::Max(ch->Health, 0.f) / ch->MaxHealth, 1), FColor::Red);
+			Canvas->DrawItem(bx);
+		}
+
+		{
+			FCanvasTextItem txt(healthBarsPos + (FVector2D(200, 35) / 2), FText::FromString(FString::FromInt((int32)FMath::Max(ch->Health, 0.f)) + "/" + FString::FromInt((int32)ch->MaxHealth)), ChatMessageFont, FColor::White);
+			txt.bCentreX = true;
+			txt.bCentreY = true;
+			txt.EnableShadow(FColor::Black, FVector2D(1, 1));
+			Canvas->DrawItem(txt);
+		}
+
+		{
+			FCanvasTileItem bx(healthBarsPos + FVector2D(0, 45), FVector2D(200, 35), FColor::Black);
+			Canvas->DrawItem(bx);
+		}
+
+		{
+			FCanvasTileItem bx(healthBarsPos + FVector2D(0, 45) + FVector2D(HEALTH_BAR_BORDER_SIZE, HEALTH_BAR_BORDER_SIZE), (FVector2D(200, 35) - FVector2D(HEALTH_BAR_BORDER_SIZE * 2, HEALTH_BAR_BORDER_SIZE * 2)) * FVector2D(FMath::Max(ch->Mana, 0.f) / ch->MaxMana, 1), FColor::Blue);
+			Canvas->DrawItem(bx);
+		}
+
+		{
+			FCanvasTextItem txt(healthBarsPos + FVector2D(0, 45) + (FVector2D(200, 35) / 2), FText::FromString(FString::FromInt((int32)FMath::Max(ch->Mana, 0.f)) + "/" + FString::FromInt((int32)ch->MaxMana)), ChatMessageFont, FColor::White);
+			txt.bCentreX = true;
+			txt.bCentreY = true;
+			txt.EnableShadow(FColor::Black, FVector2D(1, 1));
+			Canvas->DrawItem(txt);
 		}
 	}
 }

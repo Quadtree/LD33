@@ -41,6 +41,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 
+	UPROPERTY(EditAnywhere, Category = IceBolt)
+	TSubclassOf<class AIceBolt> IceBoltType;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
 	float BaseMaxHealth;
 

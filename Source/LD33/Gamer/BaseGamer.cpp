@@ -8,6 +8,7 @@
 #include "LD33HUD.h"
 #include "Guild.h"
 #include "AIController.h"
+#include "IceBolt.h"
 
 
 // Sets default values
@@ -95,6 +96,7 @@ void ABaseGamer::UpdateState()
 					else if (CurrentState != GamerState::GS_AttackingBoss && CurrentState == GamerState::GS_ApproachingBoss && IsLeader)
 					{
 						SendGamerMessage(GamerMessageType::GMT_AttackBossNow);
+						CurrentState = GamerState::GS_AttackingBoss;
 					}
 
 					// saw the boss while in town. just attack!
@@ -203,6 +205,14 @@ void ABaseGamer::UpdateState()
 			}
 		}
 	}
+
+	if (CurrentState == GamerState::GS_AttackingBoss)
+	{
+		for (TActorIterator<ALD33Character> i(GetWorld()); i; ++i)
+		{
+			if (MeleeAttack > HealPower || MagicAttack > HealPower) Attack(*i);
+		}
+	}
 }
 
 void ABaseGamer::SendGamerMessage(GamerMessageType type)
@@ -256,6 +266,7 @@ void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 
 	if (msg.Type == GamerMessageType::GMT_AttackBossNow && CurrentState != GamerState::GS_PlayerVersusPlayer && CurrentState != GamerState::GS_AttackingBoss && msg.Sender->Guild == Guild && msg.Sender->IsLeader)
 	{
+		UE_LOG(LogLD33, Display, TEXT("%s is attacking boss"), *GetName());
 		CurrentState = GamerState::GS_AttackingBoss;
 
 		if (FMath::RandRange(1, 3) == 1) SendGamerMessage(GamerMessageType::GMT_Ack);
@@ -264,7 +275,43 @@ void ABaseGamer::ReceiveGamerMessage(const FGamerMessage& msg)
 
 void ABaseGamer::Attack(AActor* target)
 {
+	auto c = Cast<AAIController>(GetController());
 
+	check(c);
+
+	float rangeToTargetSquared = FVector::DistSquared(target->GetActorLocation(), GetActorLocation());
+
+	if (MeleeAttack > MagicAttack)
+	{
+		if (rangeToTargetSquared > FMath::Square(200))
+		{
+			c->MoveToActor(target, 150);
+		}
+		else
+		{
+			target->TakeDamage(MeleeAttack * 1200, FDamageEvent(), c, this);
+		}
+	}
+	else 
+	{
+		if (rangeToTargetSquared > FMath::Square(2500))
+		{
+			c->MoveToActor(target, 2400);
+		}
+		else
+		{
+			FActorSpawnParameters p;
+			p.Instigator = this;
+			auto ib = GetWorld()->SpawnActor<AIceBolt>(IceBoltType, GetActorLocation(), FRotator::ZeroRotator);
+
+			if (ib)
+			{
+				ib->Target = target;
+				ib->Align();
+				ib->DamageOnHit = MagicAttack * 1400;
+			}
+		}
+	}
 }
 
 // Called every frame

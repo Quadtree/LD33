@@ -40,9 +40,20 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
 	float MaxHealth;
 
+	UPROPERTY(BlueprintReadOnly, Category = Stats)
+	float Mana;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
+	float MaxMana;
+
 	float AbilityCooldown;
 
 	UPROPERTY(EditAnywhere, Category = Spawn)
 	TSubclassOf<class AMeteorProjectile> MeteorProjectileType;
+
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = Death)
+	void OnDeath();
 };
 

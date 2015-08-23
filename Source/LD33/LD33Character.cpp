@@ -34,7 +34,8 @@ ALD33Character::ALD33Character()
 	TopDownCameraComponent->AttachTo(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	MaxHealth = 400000;
+	MaxHealth = 220000;
+	MaxMana = 100000;
 }
 
 void ALD33Character::BeginPlay()
@@ -42,7 +43,7 @@ void ALD33Character::BeginPlay()
 	Super::BeginPlay();
 
 	Health = MaxHealth;
-
+	Mana = MaxMana;
 	
 }
 
@@ -54,9 +55,25 @@ void ALD33Character::Tick(float DeltaSeconds)
 	AbilityCooldown -= DeltaSeconds;
 }
 
+float ALD33Character::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Health -= Damage;
+
+	if (Health <= 0)
+	{
+		GetMovementComponent()->SetActive(false);
+
+		GetMesh()->SetVisibility(false);
+
+		OnDeath();
+	}
+
+	return Damage;
+}
+
 void ALD33Character::FrontalConeAttack(FVector targetPt)
 {
-	if (AbilityCooldown > 0) return;
+	if (AbilityCooldown > 0 || Health <= 0) return;
 
 	UE_LOG(LogTemp, Display, TEXT("Frontal cone attack at %s"), *targetPt.ToString());
 
@@ -97,7 +114,7 @@ void ALD33Character::FrontalConeAttack(FVector targetPt)
 
 void ALD33Character::SoulDrainAttack(AActor* target)
 {
-	if (AbilityCooldown > 0) return;
+	if (AbilityCooldown > 0 || Health <= 0) return;
 
 	if (target)
 	{
@@ -121,7 +138,7 @@ void ALD33Character::SoulDrainAttack(AActor* target)
 
 void ALD33Character::MeteorAttack(FVector targetPt)
 {
-	if (AbilityCooldown > 0) return;
+	if (AbilityCooldown > 0 || Health <= 0) return;
 
 	UE_LOG(LogTemp, Display, TEXT("MeteorAttack at %s"), *targetPt.ToString());
 
