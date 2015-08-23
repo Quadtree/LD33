@@ -40,7 +40,7 @@ void AMeteorProjectile::OnHit(AActor* SelfActor, AActor* OtherActor, FVector Nor
 		{
 			if (a.Actor.IsValid() && Cast<ABaseGamer>(a.Actor.Get()))
 			{
-				a.Actor->TakeDamage(5000, FDamageEvent(), GetInstigator() ? GetInstigator()->GetController() : nullptr, this);
+				a.Actor->TakeDamage(7500, FDamageEvent(), GetInstigator() ? GetInstigator()->GetController() : nullptr, this);
 			}
 		}
 	}

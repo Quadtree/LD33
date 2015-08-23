@@ -24,6 +24,7 @@ void ALD33HUD::DrawHUD()
 	FVector2D healthBarsPos = FVector2D(350, Canvas->ClipY - 110);
 	FVector2D minimapPos = FVector2D(30, Canvas->ClipY - 30 - minimapSize.Y);
 	FVector2D worldHalfSize = FVector2D(WORLD_SIZE, WORLD_SIZE);
+	FVector2D overheadHealthBarSize = FVector2D(50, 4);
 
 	const float HEALTH_BAR_BORDER_SIZE = 2;
 
@@ -35,15 +36,25 @@ void ALD33HUD::DrawHUD()
 		if (pos.X >= -200 && pos.Y >= -200 && pos.X <= Canvas->ClipX + 200 && pos.Y <= Canvas->ClipY + 200)
 		{
 			{
-				FCanvasTextItem txt(FVector2D(pos.X, pos.Y - 60), FText::FromString(i->GamerName), NametagFont, FColor::Red);
+				FCanvasTextItem txt(FVector2D(pos.X, pos.Y - 70), FText::FromString(i->GamerName), NametagFont, FColor::Red);
 				txt.bCentreX = true;
 				Canvas->DrawItem(txt);
 			}
 
 			{
-				FCanvasTextItem txt(FVector2D(pos.X, pos.Y - 40), FText::FromString("<" + (i->Guild ? i->Guild->GuildName : "???") + ">"), NametagFont, FColor::Red);
+				FCanvasTextItem txt(FVector2D(pos.X, pos.Y - 50), FText::FromString("<" + (i->Guild ? i->Guild->GuildName : "???") + ">"), NametagFont, FColor::Red);
 				txt.bCentreX = true;
 				Canvas->DrawItem(txt);
+			}
+
+			{
+				FCanvasTileItem bx(FVector2D(pos.X, pos.Y - 20) - (overheadHealthBarSize / 2), overheadHealthBarSize, FColor::Black);
+				Canvas->DrawItem(bx);
+			}
+
+			{
+				FCanvasTileItem bx(FVector2D(pos.X, pos.Y - 20) - (overheadHealthBarSize / 2) + FVector2D(1, 1), (overheadHealthBarSize - FVector2D(2, 2)) * FVector2D(i->Health / i->MaxHealth, 1), FColor::Red);
+				Canvas->DrawItem(bx);
 			}
 		}
 

@@ -129,7 +129,7 @@ void ALD33Character::FrontalConeAttack(FVector targetPt)
 
 				if (FMath::Abs(ang) < 0.3f && ang2 > 0)
 				{
-					a.Actor->TakeDamage(2000, FDamageEvent(), GetController(), this);
+					a.Actor->TakeDamage(4500, FDamageEvent(), GetController(), this);
 				}
 			}
 		}
@@ -152,7 +152,7 @@ void ALD33Character::SoulDrainAttack(AActor* target)
 
 		if (auto a = Cast<ABaseGamer>(target)) initialHp = a->Health;
 
-		float actualDamage = target->TakeDamage(3500, FDamageEvent(), GetController(), this);
+		float actualDamage = target->TakeDamage(5000, FDamageEvent(), GetController(), this);
 
 		if (actualDamage >= initialHp)
 		{
