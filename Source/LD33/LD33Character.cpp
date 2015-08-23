@@ -64,7 +64,8 @@ void ALD33Character::Tick(float DeltaSeconds)
 		{
 			if (auto g = Cast<ABaseGamer>(a.Actor.Get()))
 			{
-				Mana = FMath::Min(Mana + DeltaSeconds * 200, MaxMana);
+				if (g->Health > 0)
+					Mana = FMath::Min(Mana + DeltaSeconds * 250, MaxMana);
 			}
 		}
 	}
