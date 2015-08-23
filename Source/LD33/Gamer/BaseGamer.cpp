@@ -319,7 +319,7 @@ void ABaseGamer::Attack(AActor* target)
 			{
 				ib->Target = target;
 				ib->Align();
-				ib->DamageOnHit = MagicAttack * 2800;
+				ib->DamageOnHit = MagicAttack * 3500;
 			}
 
 			IsCurrentlyAttacking = true;
