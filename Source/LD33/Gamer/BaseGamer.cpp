@@ -124,7 +124,7 @@ void ABaseGamer::UpdateState()
 				isEnemy = true;
 			}
 
-			if (CurrentState == GamerState::GS_PlayerVersusPlayer && Cast<ABaseGamer>(a.Actor.Get()) && Cast<ABaseGamer>(a.Actor.Get())->Guild != Guild && Cast<ABaseGamer>(a.Actor.Get())->Health > 0)
+			if (CurrentState == GamerState::GS_PlayerVersusPlayer && Cast<ABaseGamer>(a.Actor.Get()) && Cast<ABaseGamer>(a.Actor.Get())->Guild != Guild && Cast<ABaseGamer>(a.Actor.Get())->Health > 0 && Cast<ABaseGamer>(a.Actor.Get())->GetActorLocation().SizeSquared2D() > FMath::Square(3000))
 			{
 				isEnemy = true;
 			}

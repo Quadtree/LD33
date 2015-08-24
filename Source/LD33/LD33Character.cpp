@@ -124,6 +124,7 @@ void ALD33Character::FrontalConeAttack(FVector targetPt)
 			if (a.Actor.IsValid() && Cast<ABaseGamer>(a.Actor.Get()))
 			{
 				FVector delta = a.Actor->GetActorLocation() - GetActorLocation();
+				delta.Z = 0;
 				delta.Normalize();
 
 				FVector facing = GetActorRotation().RotateVector(FVector::RightVector);
