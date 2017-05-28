@@ -1,0 +1,62 @@
+digraph {
+	graph [overlap=false, scale=2];
+	GS_IdleInTown [label="Idle In Town", shape=rectangle];
+	GS_Farming [label="Farming", shape=rectangle];
+	GS_Scouting [label="Scouting", shape=rectangle];
+	GS_ReportingBossSighting [label="Reporting Boss Sighting", shape=rectangle];
+	GS_FollowingLeader [label="Following Leader", shape=rectangle];
+	GS_AttackingBoss [label="Attacking Boss", shape=rectangle];
+	GS_ApproachingBoss [label="Approaching Boss", shape=rectangle];
+	GS_PlayerVersusPlayer [label="Player Versus Player", shape=rectangle];
+	GS_LookingForMore [label="Looking for More", shape=rectangle];
+	GS_Any [label="Any State"];
+	GS_Respawned [label="Just Respawned"];
+	
+	GS_Any -> GS_Farming [label="Was attacked by mob"];
+	GS_Any -> GS_PlayerVersusPlayer [label="Was attacked by \"player\""];
+	GS_Any -> GS_PlayerVersusPlayer [label="Got insulted by rival guild"];
+	GS_Any -> GS_AttackingBoss [label="Was attacked by raid boss"];
+	GS_Respawned -> GS_Scouting;
+	
+	GS_PlayerVersusPlayer -> GS_IdleInTown [label="Is Idle In Town"];
+	
+	GS_Farming -> GS_ReportingBossSighting [label="Saw Boss"];
+	GS_Scouting -> GS_ReportingBossSighting [label="Saw Boss"];
+	
+	GS_ApproachingBoss -> GS_AttackingBoss [label="Is leader and in range of boss"];
+	
+	GS_IdleInTown -> GS_AttackingBoss [label="Saw Boss"];
+	
+	GS_ReportingBossSighting -> GS_LookingForMore [label="Is leader"];
+	
+	GS_ReportingBossSighting -> GS_FollowingLeader [label="Alerted leader to boss sighting"];
+	
+	GS_LookingForMore -> GS_ApproachingBoss [label="Guild assembled"];
+	
+	GS_AttackingBoss -> GS_PlayerVersusPlayer [label="Boss downed"];
+	
+	GS_Farming -> GS_Scouting [label="See no targets"];
+	GS_PlayerVersusPlayer -> GS_Scouting [label="See no targets"];
+	
+	
+	GS_IdleInTown -> GS_FollowingLeader [label="Heard leader LFM"];
+	GS_Farming -> GS_FollowingLeader [label="Heard leader LFM"];
+	GS_Scouting -> GS_FollowingLeader [label="Heard leader LFM"];
+	GS_ReportingBossSighting -> GS_FollowingLeader [label="Heard leader LFM"];
+	GS_ApproachingBoss -> GS_FollowingLeader [label="Heard leader LFM"];
+	GS_LookingForMore -> GS_FollowingLeader [label="Heard leader LFM"];
+	
+	GS_IdleInTown -> GS_LookingForMore [label="Heard report of boss up"];
+	GS_Farming -> GS_LookingForMore [label="Heard report of boss up"];
+	GS_Scouting -> GS_LookingForMore [label="Heard report of boss up"];
+	GS_ReportingBossSighting -> GS_LookingForMore [label="Heard report of boss up"];
+	GS_FollowingLeader -> GS_LookingForMore [label="Heard report of boss up"];
+	
+	GS_IdleInTown -> GS_AttackingBoss [label="Heard order to attack boss"];
+	GS_Farming -> GS_AttackingBoss [label="Heard order to attack boss"];
+	GS_Scouting -> GS_AttackingBoss [label="Heard order to attack boss"];
+	GS_ReportingBossSighting -> GS_AttackingBoss [label="Heard order to attack boss"];
+	GS_FollowingLeader -> GS_AttackingBoss [label="Heard order to attack boss"];
+	GS_ApproachingBoss -> GS_AttackingBoss [label="Heard order to attack boss"];
+	GS_LookingForMore -> GS_AttackingBoss [label="Heard order to attack boss"];
+}
